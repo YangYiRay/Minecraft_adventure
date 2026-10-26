@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#176e58">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="四篇方塊世界冒險故事，逐字直排注音，ㄣ與ㄥ挖空闖關，適合國小一年級，在 iPhone 與 iPad 上直接玩。">
+<title>方塊注音大冒險｜ㄣ ㄥ 故事與闖關</title>
+<style>
+:root {
+  --ink: #183c36; --muted: #57756e; --leaf: #14674f;
+  --bg: #f1f7ed; --cream: #fffef9; --stroke: #d4e5d7;
+  --gold: #ffc857; --mint: #def3db; --char-size: 27px;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  color: var(--ink); background: var(--bg);
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin:0; min-height:100vh; overflow-x:hidden; }
+body.large-type { --char-size:31px; }
+button { cursor:pointer; font: inherit; touch-action:manipulation; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, [role="button"]:focus-visible { outline: 3px solid #2c95ff; outline-offset: 3px; }
+button:disabled { cursor:not-allowed; opacity:.47; }
+button, .tab, .chip { user-select:none; -webkit-user-select:none; }
+a { color:var(--leaf); }
+button:not(.nav-item):active { transform:translateY(1px); }
+#app { width:100%; max-width:860px; margin:0 auto; padding: 0 13px calc(120px + env(safe-area-inset-bottom,0px)); }
+.sr-only { position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+
+.hero { position:relative; overflow:hidden; margin: 0 -13px 13px; min-height:160px; background:linear-gradient(135deg,#176e58,#0c554c); color:white; border-radius:0 0 24px 24px; padding:19px 18px 18px; }
+.hero:after { content:""; position:absolute; width:190px;height:190px;border:14px solid rgba(255,255,255,.075);border-radius:50%;right:-85px;top:-75px; }
+.hero-content { position:relative;z-index:1; display:flex;align-items:center;justify-content:space-between;gap:5px; }
+.kicker { font-size:12px; color:#c8f2cd; font-weight:800; letter-spacing:.5px; }
+.hero h1 { font-size:clamp(25px,6.9vw,37px);line-height:1.2;letter-spacing:.3px;margin:7px 0 8px;font-weight:900;text-wrap:balance; }
+.hero-sub { font-size:14px; margin:0; color:#e1f5e4; line-height:1.55; }
+.hero-art { flex:0 0 118px; width:118px; height:110px; position:relative; transform:rotate(-2deg); }
+.hero-art svg { width:100%;height:100%;display:block;filter:drop-shadow(0 6px 0 rgba(0,0,0,.13)); }
+.stat-row { display:flex; gap:7px; flex-wrap:wrap; margin:13px 0 3px; }
+.stat-chip { border:1px solid #d8e8da; background:#fffefc; padding:8px 11px; border-radius:50px; color:#2e6757; font-size:12px;font-weight:800; }
+.main-section { display:none; }
+.main-section.active { display:block; animation:fade-in .18s ease-out; }
+@keyframes fade-in { from {opacity:.2;transform:translateY(3px)} to {opacity:1;transform:none} }
+.section-heading { display:flex;align-items:center;justify-content:space-between; gap:10px; margin:15px 1px 10px; }
+.section-heading h2 { font-size:19px;margin:0;letter-spacing:.1px;font-weight:900; }
+.section-heading small { font-size:12px;color:var(--muted); }
+.card { background:var(--cream); border:1px solid var(--stroke); border-radius:20px;box-shadow:0 5px 16px rgba(33,78,49,.055); }
+.worlds { display:flex;gap:9px;overflow:auto;scroll-snap-type:x mandatory;padding:3px 1px 8px; scrollbar-width:none; }
+.worlds::-webkit-scrollbar { display:none; }
+.world-btn { flex:0 0 149px; min-height:89px;text-align:left; border:2px solid #e0e9da; background:#fff; border-radius:17px;padding:11px 12px;scroll-snap-align:start;color:#33534b;position:relative; }
+.world-btn.is-selected { background:#e8f8e0;border-color:#3e9f65; box-shadow:0 3px 0 #b4d1a4; }
+.world-btn .w-icon { font-size:24px;display:block;margin-bottom:4px;line-height:1; }
+.world-btn .w-title { display:block;font-weight:900;font-size:15px; }
+.world-btn .w-small { display:block;font-size:11px;color:#648374;margin-top:2px; }
+.world-btn .w-done { position:absolute;top:7px;right:8px;font-size:12px;background:#fff;border-radius:12px;padding:2px 5px; }
+.mini-row { display:flex;justify-content:space-between;align-items:center;gap:7px;flex-wrap:wrap;margin: 8px 0 13px; }
+.count-line { font-size:12px; color:var(--muted);font-weight:800; }
+.font-controls { display:flex;align-items:center; gap:6px; }
+.tiny-btn { min-height:39px;padding:7px 12px;border:1px solid #c8ded0;color:var(--leaf);border-radius:12px;background:white;font-weight:800;font-size:13px; }
+.tiny-btn[aria-pressed="true"] { background:#e0f4d6; border-color:#3fa46c; }
+.read-card { padding:16px 13px 13px; }
+.read-header { display:flex;align-items:center;justify-content:space-between;gap:10px; }
+.scene-tag { display:inline-block;border-radius:8px; background:#edf5e6;padding:7px 10px;color:#2c795c;font-weight:900;font-size:12px; }
+.progress-track { flex:1; max-width:190px; height:10px;border-radius:99px;background:#e0e9dd;overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#4fc48b,#9edb58);border-radius:99px;transition:width .2s; }
+.read-title { font-size:21px; line-height:1.35;font-weight:900;margin:15px 2px 2px; }
+.read-subtitle {font-size:13px;color:#6d8171; margin:3px 2px 13px;}
+.read-text { background:#fff; border:1px solid #eef0e8; border-radius:15px; padding:12px 9px 10px; min-height:160px; margin:10px 0 13px; font-weight:700; letter-spacing:0; line-height: 1.5; overflow-wrap:anywhere; }
+.read-text .text-segment { display:inline; }
+.read-text .text-segment .plain {font-size:var(--char-size);vertical-align:middle;}
+.read-text .punct { font-size:var(--char-size);vertical-align:middle;padding:0 1px;}
+.read-text .latin { font-size:calc(var(--char-size)*.70);vertical-align:middle; font-weight:800; }
+.read-hint { font-size:12px;color:#678577;line-height:1.6; margin:0 2px 9px; }
+.read-actions {display:grid;grid-template-columns:1fr 1.05fr;gap:10px;margin-top:13px;}
+.wide-btn { display:flex;align-items:center; justify-content:center;gap:7px;min-height:54px;border-radius:14px;border:1.5px solid #d5e5d7;background:#fff;color:var(--leaf);font-size:15px;font-weight:900;padding:11px 8px; }
+.wide-btn.primary { background:#166b52;border-color:#166b52;color:#fff;box-shadow:0 4px 0 #0a4f3a; }
+.wide-btn.sun { background:#ffce56;border-color:#eba324;color:#644306;box-shadow:0 4px 0 #c28c2a; }
+.wide-btn.soft { background:#e5f6dc;color:#205e48;border-color:#b6dab6; }
+.voice-tip {margin:10px 2px 0;font-size:11px;line-height:1.6;color:#789184;}
+
+/* Zhuyin is always laid out as a vertical column immediately to the right of each Han character. */
+.ruby-char { display:inline-flex; position:relative; align-items:center;justify-content:flex-start;vertical-align:middle; flex-shrink:0; white-space:nowrap; margin:0 1px 1px 0; min-height:calc(var(--char-size)*1.75); }
+.ruby-char .han {font-size:var(--char-size); line-height:1.14;font-weight:750;letter-spacing:0;}
+.zh { display:inline-flex;position:relative;align-items:center;justify-content:center;min-width:12px; min-height:calc(var(--char-size)*1.5); margin:0 1px 0 1px;padding-right:4px; }
+.zh .zh-stack { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:11px;line-height:12px;font-weight:800;letter-spacing:-.8px; }
+.zh .zh-tone { position:absolute;right:-3px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:900; }
+.zh .zh-tone.neutral {top:0px;right:0;transform:none;}
+.ruby-char.focus-han .han { color:#046e7d; }
+.ruby-char.missing-han .han { color:#a45c00; }
+.zh .blank-final {display:inline-flex;justify-content:center;align-items:center;width:12px;height:17px;border:1.7px solid #ffad26;background:#fff6d6; border-radius:4px; color:transparent; }
+.vocab-token { display:inline-flex;align-items:center;white-space:nowrap;vertical-align:middle;border-radius:8px;background:#edf8d6;border-bottom:2px solid #a2d861;padding:0 2px;margin:0 1px;cursor:pointer; }
+.vocab-token.is-mix { background:#ffecc8; border-bottom-color:#efb54b; }
+.vocab-token:active { background:#d4f5bf; }
+.speech-box {padding:14px 15px;background:#fef9eb;border:1px solid #f0dca5;border-radius:15px;margin-top:13px;}
+.speech-box strong{font-size:14px;}
+.speech-box p {margin:6px 0 0;font-size:13px;color:#6d6749;line-height:1.7;}
+
+.quiz-setup {padding:17px 15px;}
+.quiz-setup h3,.quiz-play h3{font-size:21px;margin:0 0 9px;line-height:1.4;}
+.quiz-setup p,.quiz-note {font-size:14px;color:#648070;line-height:1.65;}
+.picker-row {display:flex;gap:9px;margin:13px 0 16px;}
+.pick { flex:1;min-height:54px;border:2px solid #dbe9dc;color:#3c5b4c;background:white;border-radius:13px;font-weight:900; }
+.pick.selected {background:#e9f7dc;border-color:#45ab69;color:#185e48;}
+.quiz-play {padding:15px 13px 16px;}
+.quiz-stats {display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;font-weight:900; }
+.quiz-stars {display:inline-flex;align-items:center;gap:5px;background:#fff3cf;border-radius:16px;color:#84601d;padding:6px 11px;}
+.quiz-prog {height:10px;background:#e7eee1;border-radius:99px;margin:13px 0 16px;overflow:hidden;}
+.quiz-prog > div { height:100%;width:0%;background:linear-gradient(90deg,#73cf8c,#f0c652);transition:width .2s; }
+.quiz-label {text-align:center;color:#5b796d;font-size:13px;font-weight:900;letter-spacing:.3px;margin-bottom:8px;}
+.quiz-word { padding:20px 8px 15px;border-radius:18px;background:#edf8f4;border:2px solid #b8dfd1;min-height:106px;display:flex;align-items:center;justify-content:center;gap:1px; flex-wrap:wrap; }
+.quiz-word .ruby-char{--char-size:44px; margin:0 3px;}
+.quiz-word .zh .zh-stack {font-size:14px;line-height:17px;}
+.quiz-word .zh {min-width:16px; padding-right:5px;}
+.quiz-word .zh .zh-tone {font-size:13px;right:-3px;}
+.quiz-word .zh .blank-final {height:21px;width:18px; border-width:2px;}
+.quiz-sub {font-size:12px;text-align:center;color:#5c7d6c;margin:11px 3px 5px;}
+.quiz-sentence { padding:12px 6px 3px; background:#fff; border:1px solid #ebf0e6;border-radius:14px;max-height:245px;overflow:auto;text-align:left; }
+.quiz-sentence .ruby-char {--char-size:22px;}
+.quiz-sentence .zh .zh-stack {font-size:9px;line-height:10px;}
+.quiz-sentence .punct {font-size:22px;}
+.quiz-sentence .latin {font-size:17px;}
+.answer-hint {text-align:center;color:#496f60;font-size:15px;font-weight:900;margin:19px 0 10px;}
+.answer-row {display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.answer-button { min-height:91px;border:2.5px solid #cce2df;background:#e7f5f8;border-radius:16px;color:#0e6271;font-weight:900;font-size:40px;box-shadow:0 5px 0 #abd7dd; }
+.answer-button:nth-child(2) {background:#fff0d9;border-color:#ead8bc;color:#995c19;box-shadow:0 5px 0 #ecd0a3; }
+.answer-button:disabled {opacity:1;}
+.answer-button.wrong { background:#fee7e3;box-shadow:0 5px 0 #efbbb4;border-color:#e7a69e;color:#a53030; }
+.answer-button.correct { background:#daf6d9;box-shadow:0 5px 0 #a8dba7;border-color:#61bc76;color:#1b713a; }
+.quiz-feedback {margin:16px 0 0;padding:12px 14px;background:#e8f7e5;border:1px solid #a9d4a8;color:#2c6b35;border-radius:12px;font-size:14px;line-height:1.6;font-weight:800;}
+.quiz-feedback.error {background:#fff0e5;color:#975223;border-color:#e8c5a1;}
+.quiz-next {width:100%;margin-top:14px;}
+.quiz-audio { margin:8px auto 0; display:flex; align-items:center;justify-content:center;gap:6px; min-height:40px; padding:7px 16px; border:0;background:transparent;color:#3b776b;font-weight:900;font-size:13px; }
+.quiz-done {text-align:center;padding:24px 17px 22px;}
+.quiz-done .medal {font-size:64px;display:block;margin:3px 0 10px;animation:pop .35s ease-out;}
+@keyframes pop { from {transform:scale(.5)} to {transform:scale(1)} }
+.quiz-done h3 {font-size:25px;margin:6px 0;}
+.quiz-done p {font-size:15px;color:#5d7567;line-height:1.6;}
+.big-score{font-size:47px;color:#177150;font-weight:900;margin:10px 0;}
+.word-filters {display:flex; gap:7px; overflow:auto;scrollbar-width:none;margin:10px 0;}
+.word-filters::-webkit-scrollbar{display:none;}
+.filter-btn { flex:0 0 auto;min-height:43px; border:1.5px solid #d4e5d8;border-radius:20px;background:white;color:#3b705d;font-size:13px;padding:7px 13px;font-weight:900; }
+.filter-btn.active {background:#d9efce;border-color:#49a45f;color:#1b624a;}
+.word-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+.word-card {min-width:0;min-height:93px;border:1.5px solid #deecdf;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;border-radius:14px;padding:10px 4px;}
+.word-card .word-glyphs { display:flex;align-items:center;justify-content:center;flex-wrap:wrap; }
+.word-card .ruby-char { --char-size:23px; }
+.word-card .zh .zh-stack{font-size:9px;line-height:10px;}
+.word-card .zh .zh-tone{font-size:9px;}
+.word-card .word-kind {font-size:10px;color:#779184;font-weight:800;}
+.word-card .word-flag{font-size:10px;color:#996429;}
+.word-card:active {background:#eaf6e6;}
+.method-note { padding:13px 14px;background:#fffdf2;border:1px solid #eee6c7;border-radius:15px;margin:14px 0 10px; font-size:13px;color:#69674f;line-height:1.7; }
+.method-note strong {color:#6e6034;}
+.exam-other {padding:16px;}
+.exam-other h3 {margin:0;font-size:18px;}
+.exam-other p{color:#5d7567;font-size:14px;line-height:1.7;}
+.bottom-nav {position:fixed; z-index:60;bottom:0;left:0;right:0;background:rgba(251,255,248,.96);backdrop-filter:blur(14px);border-top:1px solid #c7e1cf; box-shadow:0 -4px 18px rgba(30,67,48,.08);padding:7px 10px calc(7px + env(safe-area-inset-bottom, 0px));}
+.nav-inner {max-width:860px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.nav-item {border:none;background:transparent;color:#608372;min-height:54px;border-radius:14px;font-size:12px;font-weight:900;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;}
+.nav-item .nav-emoji {font-size:22px;line-height:1.2;}
+.nav-item[aria-current="page"] {background:#def4d4;color:#16593f;}
+.sheet-layer {position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center;background:rgba(5,31,25,.49);}
+.sheet-layer.open {display:flex;}
+.sheet-body {width:100%;max-width:650px; padding:17px 20px calc(21px + env(safe-area-inset-bottom,0px));background:white;border-radius:24px 24px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.12);max-height:75vh;overflow:auto;position:relative;animation:rise .2s ease-out;}
+@keyframes rise {from{transform:translateY(24px);opacity:.8}to{transform:none;opacity:1}}
+.sheet-close {position:absolute;right:15px;top:14px;min-width:43px;height:43px;background:#edf4e9;border:0;border-radius:13px;color:#426552;font-size:21px;}
+.sheet-label {display:block;color:#4b7864;font-size:12px;font-weight:900;margin-bottom:8px;}
+.sheet-word {display:flex;align-items:center;gap:2px;flex-wrap:wrap;padding:7px 0 12px;}
+.sheet-word .ruby-char { --char-size:37px; }
+.sheet-body p {font-size:15px;line-height:1.65;color:#4e6c60;margin:8px 0;}
+.sheet-btn {width:100%;margin-top:12px;}
+.footer-note {margin:18px 3px 0;text-align:center;font-size:11px;color:#7a9387;line-height:1.7;}
+.tutorial {padding:12px 13px;margin-bottom:12px;background:#f8fae9;border:1px dashed #b8d6b4;border-radius:14px;display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#50755f;line-height:1.6;}
+.help-section {margin:12px 0;padding:12px 14px;}
+.help-section h3 {margin:0 0 7px;font-size:15px;}
+.help-section p {margin:0;font-size:13px;color:#557365;line-height:1.7;}
+@media(min-width:680px) {
+  #app{padding-left:25px;padding-right:25px;}
+  .hero{margin-left:-25px;margin-right:-25px;padding-left:28px;padding-right:28px;}
+  .hero-art{flex-basis:164px;width:164px;height:129px;}
+  .word-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .read-card{padding:25px;}
+  .read-text{padding:22px;}
+  .quiz-setup,.quiz-play{padding:25px;}
+  .world-btn{flex-basis:176px;}
+}
+@media(max-width:365px){
+  .hero h1{font-size:24px;}.hero-art{flex-basis:88px;width:88px;height:87px;}
+  .stat-chip{font-size:11px;padding:7px 9px;}
+  .quiz-word .ruby-char{--char-size:38px;}
+  .quiz-word .zh .zh-stack{font-size:12px;line-height:15px;}
+  .word-card .ruby-char{--char-size:20px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*,*::before,*::after{animation:none!important;transition:none!important;}}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hero">
+    <div class="hero-content">
+      <div>
+        <div class="kicker">🧱 一年級・注音冒險營</div>
+        <h1>方塊注音<br>大冒險！</h1>
+        <p class="hero-sub">妮可與終界龍的 4 篇故事<br>邊讀邊學 ㄣ、ㄥ</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 120 113" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="91" width="120" height="17" fill="#7bc64b"/><rect x="0" y="108" width="120" height="5" fill="#89613a"/>
+          <rect x="12" y="77" width="15" height="15" fill="#66ae48"/><rect x="27" y="70" width="16" height="22" fill="#93ce56"/>
+          <rect x="73" y="76" width="31" height="16" fill="#a1d45d"/><rect x="89" y="63" width="15" height="13" fill="#77b347"/>
+          <rect x="30" y="24" width="53" height="45" rx="3" fill="#a7d981"/><rect x="38" y="16" width="42" height="23" fill="#395a3f"/>
+          <rect x="35" y="27" width="40" height="40" fill="#cfb28e"/><rect x="33" y="21" width="45" height="12" fill="#5c4233"/>
+          <rect x="43" y="42" width="7" height="7" fill="#2a3734"/><rect x="62" y="42" width="7" height="7" fill="#2a3734"/>
+          <rect x="51" y="55" width="9" height="4" fill="#b87c6d"/>
+          <rect x="38" y="66" width="37" height="23" fill="#38a9aa"/><rect x="28" y="65" width="10" height="21" fill="#cfb28e"/>
+          <rect x="75" y="64" width="10" height="21" fill="#cfb28e"/><rect x="40" y="89" width="12" height="16" fill="#394769"/>
+          <rect x="60" y="89" width="12" height="16" fill="#394769"/>
+          <rect x="87" y="11" width="7" height="7" fill="#ffda5a"/><rect x="94" y="18" width="7" height="7" fill="#ffda5a"/>
+          <rect x="6" y="30" width="8" height="8" fill="#99d5ae"/><rect x="14" y="30" width="8" height="8" fill="#99d5ae"/>
+          <rect x="103" y="47" width="9" height="9" fill="#bde89d"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <div class="stat-row" aria-label="教材概要">
+    <span class="stat-chip">📚 4 篇故事</span>
+    <span class="stat-chip">🔤 106 組詞語</span>
+    <span class="stat-chip">⭐ ㄣ／ㄥ 挖空</span>
+  </div>
+
+  <main>
+    <section class="main-section active" id="panel-read" aria-label="閱讀故事">
+      <div class="section-heading"><h2>🌍 選擇故事世界</h2><small>左右滑選故事</small></div>
+      <div id="read-worlds" class="worlds" role="group" aria-label="四篇故事"></div>
+      <div class="mini-row">
+        <div class="count-line" id="read-count"></div>
+        <div class="font-controls" role="group" aria-label="國字大小">
+          <span class="count-line">字體</span>
+          <button class="tiny-btn" type="button" data-size="1" aria-pressed="true">一般</button>
+          <button class="tiny-btn" type="button" data-size="1.15" aria-pressed="false">大字 ＋</button>
+        </div>
+      </div>
+      <article class="card read-card" aria-label="注音故事">
+        <div class="read-header">
+          <span class="scene-tag" id="scene-label"></span>
+          <div class="progress-track" aria-label="本篇閱讀進度"><div id="scene-progress" class="progress-fill"></div></div>
+        </div>
+        <h2 id="read-title" class="read-title"></h2>
+        <div id="read-subtitle" class="read-subtitle"></div>
+        <div id="read-text" class="read-text" lang="zh-Hant-TW"></div>
+        <p class="read-hint">👆 綠色詞語可以點開放大，注音就在每個國字的右邊。</p>
+        <button id="read-aloud" type="button" class="wide-btn soft" style="width:100%">🔊 朗讀這一段</button>
+        <div class="read-actions">
+          <button id="prev-scene" type="button" class="wide-btn">⬅️ 上一段</button>
+          <button id="next-scene" type="button" class="wide-btn primary">➡️ 下一段</button>
+        </div>
+        <button id="read-finish" type="button" class="wide-btn sun" style="width:100%;margin-top:16px;display:none">⭐ 讀完了！挑戰考試</button>
+        <p class="voice-tip">朗讀使用裝置內建的中文語音；部分 iPhone 若未安裝中文語音，可能無法播放。閱讀與考試不需要網路或帳號。</p>
+      </article>
+      <div class="speech-box">
+        <strong>🧠 小祕訣：ㄣ 與 ㄥ 怎麼分？</strong>
+        <p><b>ㄣ</b>：舌尖靠近上牙後方，像「森、真、晨」。<br><b>ㄥ</b>：舌根往後抬，像「風、聲、星」。<br>先慢慢唸，再按下「考試」來挑戰！</p>
+      </div>
+    </section>
+
+    <section class="main-section" id="panel-quiz" aria-label="注音闖關考試">
+      <div class="section-heading"><h2>⛏️ 注音挖空闖關</h2><small>不用打字，按一下就好</small></div>
+      <div id="quiz-worlds" class="worlds" role="group" aria-label="選擇考試故事"></div>
+      <div id="quiz-body"></div>
+    </section>
+
+    <section class="main-section" id="panel-words" aria-label="全部詞語表">
+      <div class="section-heading"><h2>🔍 詞語收藏冊</h2><small id="word-count"></small></div>
+      <div class="tutorial"><span aria-hidden="true">✨</span><span>每個國字旁都有完整注音。點一下詞語，可以放大看，還可以聽朗讀。</span></div>
+      <div class="word-filters" id="word-filters" role="group" aria-label="依韻母分類"></div>
+      <div class="word-grid" id="word-grid"></div>
+      <p class="method-note"><strong>教材校對說明：</strong>依手寫照片共整理 112 筆詞語（含重複），去重後為 106 組。其中「園中」、「等你喔」的原稿筆跡仍有不確定性，已標註待核對。詞語分類以實際注音為準，ㄢ／ㄤ 不等於 ㄣ／ㄥ。</p>
+    </section>
+  </main>
+  <footer class="footer-note">單一 HTML・無帳號・無廣告・成績只保存在這台裝置的瀏覽器。<br>故事為方塊風格的原創練習內容，非遊戲官方作品。</footer>
+</div>
+<nav class="bottom-nav" aria-label="功能選單">
+  <div class="nav-inner">
+    <button type="button" class="nav-item" data-tab="read" aria-current="page"><span class="nav-emoji">📖</span><span>讀故事</span></button>
+    <button type="button" class="nav-item" data-tab="quiz" aria-current="false"><span class="nav-emoji">⭐</span><span>闖關考試</span></button>
+    <button type="button" class="nav-item" data-tab="words" aria-current="false"><span class="nav-emoji">🔤</span><span>詞語庫</span></button>
+  </div>
+</nav>
+<div id="sheet" class="sheet-layer" role="dialog" aria-modal="true" aria-label="詞語放大鏡" aria-hidden="true">
+  <div class="sheet-body">
+    <button id="sheet-close" type="button" class="sheet-close" aria-label="關閉詞語資訊">✕</button>
+    <div id="sheet-inner"></div>
+  </div>
+</div>
+<div id="toast" role="status" style="display:none;position:fixed;z-index:120;bottom:calc(98px + env(safe-area-inset-bottom,0px));left:5%;right:5%;max-width:560px;margin:auto;padding:12px 15px;background:#29483e;color:white;border-radius:13px;font-size:13px;text-align:center;box-shadow:0 7px 20px #0003"></div>
+<script>
+'use strict';
+// All content and pronunciation data is embedded in this file. No fetch, CDN or server API.
+const DATA = {"chapters":[{"id":"forest","title":"妮可與神祕的森林地圖","short":"森林地圖","theme":"ㄣ 的冒險","subtitle":"前鼻音任務","emoji":"🌲","practice":"en","story":"今天是新年的前一天。妮可·懷特穿新衣，背著小背包，走進 Minecraft 的森林。白雲飄在天上，溪裡有小金魚，水池中還有一隻愛跳水的海豚。\n森林入口，一個雪人正在看門。雪人拿出一張蓋著印章的地圖，說：「我們有一位村民沉睡好久了。你能幫忙嗎？」\n「什麼？要怎麼幫忙？」妮可問。\n雪人說：「請認真讀地圖。上面有拼音、注音，還有幾個小音符。」\n妮可跟著小音符哼起音樂，心裡開心極了。忽然，一陣陣怪風吹過，地面輕輕搖晃，原來是小小的地震！妮可站穩身體，繼續向前走。\n一位打扮成軍人的村民從樹後跑出來，伸長脖子說：「看！那個舊輪胎後面有一扇門。」\n妮可把輪胎移開，看見地上有幾顆圓球。雪人笑著說：「來玩滾球遊戲吧！把球送到門口，門就會開。」\n妮可把球滾進洞裡，門開了！裡頭有一台鋼琴。她坐下彈鋼琴，柔柔的歌聲飄出窗外，沉睡的村民終於醒來。\n「真是美！這首歌好好聽！」村民笑了。妮可也笑了：「太好了！我們成功了！」","readings":["ㄐㄧㄣ","ㄊㄧㄢ","ㄕˋ","ㄒㄧㄣ","ㄋㄧㄢˊ","ㄉㄜ˙","ㄑㄧㄢˊ","ㄧ","ㄊㄧㄢ","","ㄋㄧˊ","ㄎㄜˇ","","ㄏㄨㄞˊ","ㄊㄜˋ","ㄔㄨㄢ","ㄒㄧㄣ","ㄧ","","ㄅㄟ","ㄓㄜ˙","ㄒㄧㄠˇ","ㄅㄟˋ","ㄅㄠ","","ㄗㄡˇ","ㄐㄧㄣˋ","","","","","","","","","","","","ㄉㄜ˙","ㄙㄣ","ㄌㄧㄣˊ","","ㄅㄞˊ","ㄩㄣˊ","ㄆㄧㄠ","ㄗㄞˋ","ㄊㄧㄢ","ㄕㄤˋ","","ㄒㄧ","ㄌㄧˇ","ㄧㄡˇ","ㄒㄧㄠˇ","ㄐㄧㄣ","ㄩˊ","","ㄕㄨㄟˇ","ㄔˊ","ㄓㄨㄥ","ㄏㄞˊ","ㄧㄡˇ","ㄧˋ","ㄓ","ㄞˋ","ㄊㄧㄠˋ","ㄕㄨㄟˇ","ㄉㄜ˙","ㄏㄞˇ","ㄊㄨㄣˊ","","","ㄙㄣ","ㄌㄧㄣˊ","ㄖㄨˋ","ㄎㄡˇ","","ㄧˊ","ㄍㄜ˙","ㄒㄩㄝˇ","ㄖㄣˊ","ㄓㄥˋ","ㄗㄞˋ","ㄎㄢ","ㄇㄣˊ","","ㄒㄩㄝˇ","ㄖㄣˊ","ㄋㄚˊ","ㄔㄨ","ㄧˋ","ㄓㄤ","ㄍㄞˋ","ㄓㄜ˙","ㄧㄣˋ","ㄓㄤ","ㄉㄜ˙","ㄉㄧˋ","ㄊㄨˊ","","ㄕㄨㄛ","","","ㄨㄛˇ","ㄇㄣ˙","ㄧㄡˇ","ㄧˊ","ㄨㄟˋ","ㄘㄨㄣ","ㄇㄧㄣˊ","ㄔㄣˊ","ㄕㄨㄟˋ","ㄏㄠˇ","ㄐㄧㄡˇ","ㄌㄜ˙","","ㄋㄧˇ","ㄋㄥˊ","ㄅㄤ","ㄇㄤˊ","ㄇㄚ˙","","","","","ㄕㄣˊ","ㄇㄜ˙","","ㄧㄠˋ","ㄗㄣˇ","ㄇㄜ˙","ㄅㄤ","ㄇㄤˊ","","","ㄋㄧˊ","ㄎㄜˇ","ㄨㄣˋ","","","ㄒㄩㄝˇ","ㄖㄣˊ","ㄕㄨㄛ","","","ㄑㄧㄥˇ","ㄖㄣˋ","ㄓㄣ","ㄉㄨˊ","ㄉㄧˋ","ㄊㄨˊ","","ㄕㄤˋ","ㄇㄧㄢˋ","ㄧㄡˇ","ㄆㄧㄣ","ㄧㄣ","","ㄓㄨˋ","ㄧㄣ","","ㄏㄞˊ","ㄧㄡˇ","ㄐㄧˇ","ㄍㄜˋ","ㄒㄧㄠˇ","ㄧㄣ","ㄈㄨˊ","","","","ㄋㄧˊ","ㄎㄜˇ","ㄍㄣ","ㄓㄜ˙","ㄒㄧㄠˇ","ㄧㄣ","ㄈㄨˊ","ㄏㄥ","ㄑㄧˇ","ㄧㄣ","ㄩㄝˋ","","ㄒㄧㄣ","ㄌㄧˇ","ㄎㄞ","ㄒㄧㄣ","ㄐㄧˊ","ㄌㄜ˙","","ㄏㄨ","ㄖㄢˊ","","ㄧˊ","ㄓㄣˋ","ㄓㄣˋ","ㄍㄨㄞˋ","ㄈㄥ","ㄔㄨㄟ","ㄍㄨㄛˋ","","ㄉㄧˋ","ㄇㄧㄢˋ","ㄑㄧㄥ","ㄑㄧㄥ","ㄧㄠˊ","ㄏㄨㄤˇ","","ㄩㄢˊ","ㄌㄞˊ","ㄕˋ","ㄒㄧㄠˇ","ㄒㄧㄠˇ","ㄉㄜ˙","ㄉㄧˋ","ㄓㄣˋ","","ㄋㄧˊ","ㄎㄜˇ","ㄓㄢˋ","ㄨㄣˇ","ㄕㄣ","ㄊㄧˇ","","ㄐㄧˋ","ㄒㄩˋ","ㄒㄧㄤˋ","ㄑㄧㄢˊ","ㄗㄡˇ","","","ㄧˊ","ㄨㄟˋ","ㄉㄚˇ","ㄅㄢˋ","ㄔㄥˊ","ㄐㄩㄣ","ㄖㄣˊ","ㄉㄜ˙","ㄘㄨㄣ","ㄇㄧㄣˊ","ㄘㄨㄥˊ","ㄕㄨˋ","ㄏㄡˋ","ㄆㄠˇ","ㄔㄨ","ㄌㄞˊ","","ㄕㄣ","ㄔㄤˊ","ㄅㄛˊ","ㄗ˙","ㄕㄨㄛ","","","ㄎㄢˋ","","ㄋㄚˋ","ㄍㄜˋ","ㄐㄧㄡˋ","ㄌㄨㄣˊ","ㄊㄞ","ㄏㄡˋ","ㄇㄧㄢˋ","ㄧㄡˇ","ㄧˊ","ㄕㄢˋ","ㄇㄣˊ","","","","ㄋㄧˊ","ㄎㄜˇ","ㄅㄚˇ","ㄌㄨㄣˊ","ㄊㄞ","ㄧˊ","ㄎㄞ","","ㄎㄢˋ","ㄐㄧㄢˋ","ㄉㄧˋ","ㄕㄤˋ","ㄧㄡˇ","ㄐㄧˇ","ㄎㄜ","ㄩㄢˊ","ㄑㄧㄡˊ","","ㄒㄩㄝˇ","ㄖㄣˊ","ㄒㄧㄠˋ","ㄓㄜ˙","ㄕㄨㄛ","","","ㄌㄞˊ","ㄨㄢˊ","ㄍㄨㄣˇ","ㄑㄧㄡˊ","ㄧㄡˊ","ㄒㄧˋ","ㄅㄚ˙","","ㄅㄚˇ","ㄑㄧㄡˊ","ㄙㄨㄥˋ","ㄉㄠˋ","ㄇㄣˊ","ㄎㄡˇ","","ㄇㄣˊ","ㄐㄧㄡˋ","ㄏㄨㄟˋ","ㄎㄞ","","","","ㄋㄧˊ","ㄎㄜˇ","ㄅㄚˇ","ㄑㄧㄡˊ","ㄍㄨㄣˇ","ㄐㄧㄣˋ","ㄉㄨㄥˋ","ㄌㄧˇ","","ㄇㄣˊ","ㄎㄞ","ㄌㄜ˙","","ㄌㄧˇ","ㄊㄡ˙","ㄧㄡˇ","ㄧˋ","ㄊㄞˊ","ㄍㄤ","ㄑㄧㄣˊ","","ㄊㄚ","ㄗㄨㄛˋ","ㄒㄧㄚˋ","ㄊㄢˊ","ㄍㄤ","ㄑㄧㄣˊ","","ㄖㄡˊ","ㄖㄡˊ","ㄉㄜ˙","ㄍㄜ","ㄕㄥ","ㄆㄧㄠ","ㄔㄨ","ㄔㄨㄤ","ㄨㄞˋ","","ㄔㄣˊ","ㄕㄨㄟˋ","ㄉㄜ˙","ㄘㄨㄣ","ㄇㄧㄣˊ","ㄓㄨㄥ","ㄩˊ","ㄒㄧㄥˇ","ㄌㄞˊ","","","","ㄓㄣ","ㄕˋ","ㄇㄟˇ","","ㄓㄜˋ","ㄕㄡˇ","ㄍㄜ","ㄏㄠˇ","ㄏㄠˇ","ㄊㄧㄥ","","","ㄘㄨㄣ","ㄇㄧㄣˊ","ㄒㄧㄠˋ","ㄌㄜ˙","","ㄋㄧˊ","ㄎㄜˇ","ㄧㄝˇ","ㄒㄧㄠˋ","ㄌㄜ˙","","","ㄊㄞˋ","ㄏㄠˇ","ㄌㄜ˙","","ㄨㄛˇ","ㄇㄣ˙","ㄔㄥˊ","ㄍㄨㄥ","ㄌㄜ˙","",""]},{"id":"village","title":"動物村莊的生日派對","short":"動物派對","theme":"ㄥ 的冒險","subtitle":"後鼻音任務","emoji":"🎂","practice":"eng","story":"第二天，妮可來到方塊動物村。大門口的公雞大叫，把睡過頭的值日生叫醒。牆上有一張生日邀請卡，寫著「等你來！」旁邊還有一張小牌子：「等你喔！」\n原來今天是小熊的生日！大家要一起慶祝。花園中掛著燈籠，還有風鈴、風車和風箏。每樣東西都放得整齊。微風輕輕吹，風車不停歇地轉著，風鈴也叮叮響。\n一隻戴眼鏡的青蛙坐在花叢旁。蜻蜓、蜜蜂和螢火蟲飛來飛去。空中有老鷹，樹上有貓頭鷹。到了夜裡，星星也跑出來參加派對。\n小紅帽抱來鳳梨和蘋果。大人把桌布燙平，讓桌子漂漂亮亮。小嬰兒躺在嬰兒車裡，伸手想抓氣球。貓熊送來一個不倒翁，逗得兒童們哈哈大笑。\n妮可忽然看見一隻大恐龍，嚇得停下腳步。走近一看，原來恐龍是用方塊拼起來的！旁邊還有一座大鯨魚雕像。大家在水池裡游泳，玩得很高興。\n小熊說：「好冷！我要休息一下。」牠剛才跑太快，腳有一點疼痛，妮可扶牠坐好。\n妮可想使用煙火來慶祝，卻把告示牌看錯了。她急忙更正：「不是『終界龍來搗蛋』，是『終界使者來聽故事』！」\n「我一定會乖乖坐好！」終界使者說。它放下一包東西，裡頭竟是一張通往終界的地圖。","readings":["ㄉㄧˋ","ㄦˋ","ㄊㄧㄢ","","ㄋㄧˊ","ㄎㄜˇ","ㄌㄞˊ","ㄉㄠˋ","ㄈㄤ","ㄎㄨㄞˋ","ㄉㄨㄥˋ","ㄨˋ","ㄘㄨㄣ","","ㄉㄚˋ","ㄇㄣˊ","ㄎㄡˇ","ㄉㄜ˙","ㄍㄨㄥ","ㄐㄧ","ㄉㄚˋ","ㄐㄧㄠˋ","","ㄅㄚˇ","ㄕㄨㄟˋ","ㄍㄨㄛˋ","ㄊㄡˊ","ㄉㄜ˙","ㄓˊ","ㄖˋ","ㄕㄥ","ㄐㄧㄠˋ","ㄒㄧㄥˇ","","ㄑㄧㄤˊ","ㄕㄤˋ","ㄧㄡˇ","ㄧˋ","ㄓㄤ","ㄕㄥ","ㄖˋ","ㄧㄠ","ㄑㄧㄥˇ","ㄎㄚˇ","","ㄒㄧㄝˇ","ㄓㄜ˙","","ㄉㄥˇ","ㄋㄧˇ","ㄌㄞˊ","","","ㄆㄤˊ","ㄅㄧㄢ","ㄏㄞˊ","ㄧㄡˇ","ㄧˋ","ㄓㄤ","ㄒㄧㄠˇ","ㄆㄞˊ","ㄗ","","","ㄉㄥˇ","ㄋㄧˇ","ㄛ","","","","ㄩㄢˊ","ㄌㄞˊ","ㄐㄧㄣ","ㄊㄧㄢ","ㄕˋ","ㄒㄧㄠˇ","ㄒㄩㄥˊ","ㄉㄜ˙","ㄕㄥ","ㄖˋ","","ㄉㄚˋ","ㄐㄧㄚ","ㄧㄠˋ","ㄧˋ","ㄑㄧˇ","ㄑㄧㄥˋ","ㄓㄨˋ","","ㄏㄨㄚ","ㄩㄢˊ","ㄓㄨㄥ","ㄍㄨㄚˋ","ㄓㄜ˙","ㄉㄥ","ㄌㄨㄥˊ","","ㄏㄞˊ","ㄧㄡˇ","ㄈㄥ","ㄌㄧㄥˊ","","ㄈㄥ","ㄔㄜ","ㄏㄜˊ","ㄈㄥ","ㄓㄥ","","ㄇㄟˇ","ㄧㄤˋ","ㄉㄨㄥ","ㄒㄧ˙","ㄉㄡ","ㄈㄤˋ","ㄉㄜ˙","ㄓㄥˇ","ㄑㄧˊ","","ㄨㄟˊ","ㄈㄥ","ㄑㄧㄥ","ㄑㄧㄥ","ㄔㄨㄟ","","ㄈㄥ","ㄔㄜ","ㄅㄨˋ","ㄊㄧㄥˊ","ㄒㄧㄝ","ㄉㄧˋ","ㄓㄨㄢˇ","ㄓㄜ˙","","ㄈㄥ","ㄌㄧㄥˊ","ㄧㄝˇ","ㄉㄧㄥ","ㄉㄧㄥ","ㄒㄧㄤˇ","","","ㄧˋ","ㄓ","ㄉㄞˋ","ㄧㄢˇ","ㄐㄧㄥˋ","ㄉㄜ˙","ㄑㄧㄥ","ㄨㄚ","ㄗㄨㄛˋ","ㄗㄞˋ","ㄏㄨㄚ","ㄘㄨㄥˊ","ㄆㄤˊ","","ㄑㄧㄥ","ㄊㄧㄥˊ","","ㄇㄧˋ","ㄈㄥ","ㄏㄜˊ","ㄧㄥˊ","ㄏㄨㄛˇ","ㄔㄨㄥˊ","ㄈㄟ","ㄌㄞˊ","ㄈㄟ","ㄑㄩˋ","","ㄎㄨㄥ","ㄓㄨㄥ","ㄧㄡˇ","ㄌㄠˇ","ㄧㄥ","","ㄕㄨˋ","ㄕㄤˋ","ㄧㄡˇ","ㄇㄠ","ㄊㄡˊ","ㄧㄥ","","ㄉㄠˋ","ㄌㄜ˙","ㄧㄝˋ","ㄌㄧˇ","","ㄒㄧㄥ","ㄒㄧㄥ˙","ㄧㄝˇ","ㄆㄠˇ","ㄔㄨ","ㄌㄞˊ","ㄘㄢ","ㄐㄧㄚ","ㄆㄞˋ","ㄉㄨㄟˋ","","","ㄒㄧㄠˇ","ㄏㄨㄥˊ","ㄇㄠˋ","ㄅㄠˋ","ㄌㄞˊ","ㄈㄥˋ","ㄌㄧˊ","ㄏㄜˊ","ㄆㄧㄥˊ","ㄍㄨㄛˇ","","ㄉㄚˋ","ㄖㄣˊ","ㄅㄚˇ","ㄓㄨㄛ","ㄅㄨˋ","ㄊㄤˋ","ㄆㄧㄥˊ","","ㄖㄤˋ","ㄓㄨㄛ","ㄗ˙","ㄆㄧㄠˋ","ㄆㄧㄠˋ","ㄌㄧㄤˋ","ㄌㄧㄤˋ","","ㄒㄧㄠˇ","ㄧㄥ","ㄦˊ","ㄊㄤˇ","ㄗㄞˋ","ㄧㄥ","ㄦˊ","ㄔㄜ","ㄌㄧˇ","","ㄕㄣ","ㄕㄡˇ","ㄒㄧㄤˇ","ㄓㄨㄚ","ㄑㄧˋ","ㄑㄧㄡˊ","","ㄇㄠ","ㄒㄩㄥˊ","ㄙㄨㄥˋ","ㄌㄞˊ","ㄧˊ","ㄍㄜ˙","ㄅㄨˋ","ㄉㄠˇ","ㄨㄥ","","ㄉㄡˋ","ㄉㄜ˙","ㄦˊ","ㄊㄨㄥˊ","ㄇㄣ˙","ㄏㄚ","ㄏㄚ","ㄉㄚˋ","ㄒㄧㄠˋ","","","ㄋㄧˊ","ㄎㄜˇ","ㄏㄨ","ㄖㄢˊ","ㄎㄢˋ","ㄐㄧㄢˋ","ㄧˋ","ㄓ","ㄉㄚˋ","ㄎㄨㄥˇ","ㄌㄨㄥˊ","","ㄒㄧㄚˋ","ㄉㄜ˙","ㄊㄧㄥˊ","ㄒㄧㄚˋ","ㄐㄧㄠˇ","ㄅㄨˋ","","ㄗㄡˇ","ㄐㄧㄣˋ","ㄧ","ㄎㄢˋ","","ㄩㄢˊ","ㄌㄞˊ","ㄎㄨㄥˇ","ㄌㄨㄥˊ","ㄕˋ","ㄩㄥˋ","ㄈㄤ","ㄎㄨㄞˋ","ㄆㄧㄣ","ㄑㄧˇ","ㄌㄞˊ","ㄉㄜ˙","","ㄆㄤˊ","ㄅㄧㄢ","ㄏㄞˊ","ㄧㄡˇ","ㄧˊ","ㄗㄨㄛˋ","ㄉㄚˋ","ㄐㄧㄥ","ㄩˊ","ㄉㄧㄠ","ㄒㄧㄤˋ","","ㄉㄚˋ","ㄐㄧㄚ","ㄗㄞˋ","ㄕㄨㄟˇ","ㄔˊ","ㄌㄧˇ","ㄧㄡˊ","ㄩㄥˇ","","ㄨㄢˊ","ㄉㄜ˙","ㄏㄣˇ","ㄍㄠ","ㄒㄧㄥˋ","","","ㄒㄧㄠˇ","ㄒㄩㄥˊ","ㄕㄨㄛ","","","ㄏㄠˇ","ㄌㄥˇ","","ㄨㄛˇ","ㄧㄠˋ","ㄒㄧㄡ","ㄒㄧ","ㄧˊ","ㄒㄧㄚˋ","","","ㄊㄚ","ㄍㄤ","ㄘㄞˊ","ㄆㄠˇ","ㄊㄞˋ","ㄎㄨㄞˋ","","ㄐㄧㄠˇ","ㄧㄡˇ","ㄧˋ","ㄉㄧㄢˇ","ㄊㄥˊ","ㄊㄨㄥˋ","","ㄋㄧˊ","ㄎㄜˇ","ㄈㄨˊ","ㄊㄚ","ㄗㄨㄛˋ","ㄏㄠˇ","","","ㄋㄧˊ","ㄎㄜˇ","ㄒㄧㄤˇ","ㄕˇ","ㄩㄥˋ","ㄧㄢ","ㄏㄨㄛˇ","ㄌㄞˊ","ㄑㄧㄥˋ","ㄓㄨˋ","","ㄑㄩㄝˋ","ㄅㄚˇ","ㄍㄠˋ","ㄕˋ","ㄆㄞˊ","ㄎㄢˋ","ㄘㄨㄛˋ","ㄌㄜ˙","","ㄊㄚ","ㄐㄧˊ","ㄇㄤˊ","ㄍㄥ","ㄓㄥˋ","","","ㄅㄨˊ","ㄕˋ","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄌㄨㄥˊ","ㄌㄞˊ","ㄉㄠˇ","ㄉㄢˋ","","","ㄕˋ","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄕˇ","ㄓㄜˇ","ㄌㄞˊ","ㄊㄧㄥ","ㄍㄨˋ","ㄕˋ","","","","","","ㄨㄛˇ","ㄧˊ","ㄉㄧㄥˋ","ㄏㄨㄟˋ","ㄍㄨㄞ","ㄍㄨㄞ","ㄗㄨㄛˋ","ㄏㄠˇ","","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄕˇ","ㄓㄜˇ","ㄕㄨㄛ","","ㄊㄚ","ㄈㄤˋ","ㄒㄧㄚˋ","ㄧˋ","ㄅㄠ","ㄉㄨㄥ","ㄒㄧ˙","","ㄌㄧˇ","ㄊㄡ˙","ㄐㄧㄥˋ","ㄕˋ","ㄧˋ","ㄓㄤ","ㄊㄨㄥ","ㄨㄤˇ","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄉㄜ˙","ㄉㄧˋ","ㄊㄨˊ",""]},{"id":"dragon","title":"終界龍的祕密寶物","short":"終界龍祕寶","theme":"ㄣ＋ㄥ 混合","subtitle":"雙音挑戰","emoji":"🐉","practice":"mix","story":"第三天的清晨，妮可和朋友先做運動，再一起看地圖。大家的心情有點緊張，卻也覺得很幸運。\n終界使者拿出一盒冰淇淋，說：「這是旅行點心！要找真正的寶物，就要勇敢又有禮貌。」\n他們走過一片森林，看見蜻蜓停在風箏上。妮可想起學過的注音，把地圖上的「森林」和「風箏」讀給大家聽。\n到了終界，黑色的高塔立在眼前。終界龍張開大翅膀，大聲問：「你們要拿走我的靈魂之光嗎？」\n妮可說：「不是喔！我們只是想幫村莊找回笑聲。可以跟你做朋友嗎？」\n終界龍低下頭，說：「我一直在這裡看著星星，沒有朋友。我以為大家都要搶我的寶物。」\n妮可把冰淇淋送給牠。大家一起說話、玩遊戲。終界龍笑了，拿出一顆會發光的石頭：「這就是靈魂之光。它不是用來打架的，而是提醒大家，要有善良的心。」\n妮可說：「原來真正的寶物，就是朋友！」大家快樂地回家，心情像飛起來一樣。","readings":["ㄉㄧˋ","ㄙㄢ","ㄊㄧㄢ","ㄉㄜ˙","ㄑㄧㄥ","ㄔㄣˊ","","ㄋㄧˊ","ㄎㄜˇ","ㄏㄜˊ","ㄆㄥˊ","ㄧㄡˇ","ㄒㄧㄢ","ㄗㄨㄛˋ","ㄩㄣˋ","ㄉㄨㄥˋ","","ㄗㄞˋ","ㄧˋ","ㄑㄧˇ","ㄎㄢˋ","ㄉㄧˋ","ㄊㄨˊ","","ㄉㄚˋ","ㄐㄧㄚ","ㄉㄜ˙","ㄒㄧㄣ","ㄑㄧㄥˊ","ㄧㄡˇ","ㄉㄧㄢˇ","ㄐㄧㄣˇ","ㄓㄤ","","ㄑㄩㄝˋ","ㄧㄝˇ","ㄐㄩㄝˊ","ㄉㄜ˙","ㄏㄣˇ","ㄒㄧㄥˋ","ㄩㄣˋ","","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄕˇ","ㄓㄜˇ","ㄋㄚˊ","ㄔㄨ","ㄧˋ","ㄏㄜˊ","ㄅㄧㄥ","ㄑㄧˊ","ㄌㄧㄣˊ","","ㄕㄨㄛ","","","ㄓㄜˋ","ㄕˋ","ㄌㄩˇ","ㄒㄧㄥˊ","ㄉㄧㄢˇ","ㄒㄧㄣ","","ㄧㄠˋ","ㄓㄠˇ","ㄓㄣ","ㄓㄥˋ","ㄉㄜ˙","ㄅㄠˇ","ㄨˋ","","ㄐㄧㄡˋ","ㄧㄠˋ","ㄩㄥˇ","ㄍㄢˇ","ㄧㄡˋ","ㄧㄡˇ","ㄌㄧˇ","ㄇㄠˋ","","","","ㄊㄚ","ㄇㄣ˙","ㄗㄡˇ","ㄍㄨㄛˋ","ㄧˊ","ㄆㄧㄢˋ","ㄙㄣ","ㄌㄧㄣˊ","","ㄎㄢˋ","ㄐㄧㄢˋ","ㄑㄧㄥ","ㄊㄧㄥˊ","ㄊㄧㄥˊ","ㄗㄞˋ","ㄈㄥ","ㄓㄥ","ㄕㄤˋ","","ㄋㄧˊ","ㄎㄜˇ","ㄒㄧㄤˇ","ㄑㄧˇ","ㄒㄩㄝˊ","ㄍㄨㄛˋ","ㄉㄜ˙","ㄓㄨˋ","ㄧㄣ","","ㄅㄚˇ","ㄉㄧˋ","ㄊㄨˊ","ㄕㄤˋ","ㄉㄜ˙","","ㄙㄣ","ㄌㄧㄣˊ","","ㄏㄜˊ","","ㄈㄥ","ㄓㄥ","","ㄉㄨˊ","ㄍㄟˇ","ㄉㄚˋ","ㄐㄧㄚ","ㄊㄧㄥ","","","ㄉㄠˋ","ㄌㄜ˙","ㄓㄨㄥ","ㄐㄧㄝˋ","","ㄏㄟ","ㄙㄜˋ","ㄉㄜ˙","ㄍㄠ","ㄊㄚˇ","ㄌㄧˋ","ㄗㄞˋ","ㄧㄢˇ","ㄑㄧㄢˊ","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄌㄨㄥˊ","ㄓㄤ","ㄎㄞ","ㄉㄚˋ","ㄔˋ","ㄅㄤˇ","","ㄉㄚˋ","ㄕㄥ","ㄨㄣˋ","","","ㄋㄧˇ","ㄇㄣ˙","ㄧㄠˋ","ㄋㄚˊ","ㄗㄡˇ","ㄨㄛˇ","ㄉㄜ˙","ㄌㄧㄥˊ","ㄏㄨㄣˊ","ㄓ","ㄍㄨㄤ","ㄇㄚ˙","","","","ㄋㄧˊ","ㄎㄜˇ","ㄕㄨㄛ","","","ㄅㄨˊ","ㄕˋ","ㄛ","","ㄨㄛˇ","ㄇㄣ˙","ㄓˇ","ㄕˋ","ㄒㄧㄤˇ","ㄅㄤ","ㄘㄨㄣ","ㄓㄨㄤ","ㄓㄠˇ","ㄏㄨㄟˊ","ㄒㄧㄠˋ","ㄕㄥ","","ㄎㄜˇ","ㄧˇ","ㄍㄣ","ㄋㄧˇ","ㄗㄨㄛˋ","ㄆㄥˊ","ㄧㄡˇ","ㄇㄚ˙","","","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄌㄨㄥˊ","ㄉㄧ","ㄒㄧㄚˋ","ㄊㄡˊ","","ㄕㄨㄛ","","","ㄨㄛˇ","ㄧˋ","ㄓˊ","ㄗㄞˋ","ㄓㄜˋ","ㄌㄧˇ","ㄎㄢˋ","ㄓㄜ˙","ㄒㄧㄥ","ㄒㄧㄥ˙","","ㄇㄟˊ","ㄧㄡˇ","ㄆㄥˊ","ㄧㄡˇ","","ㄨㄛˇ","ㄧˇ","ㄨㄟˋ","ㄉㄚˋ","ㄐㄧㄚ","ㄉㄡ","ㄧㄠˋ","ㄑㄧㄤˇ","ㄨㄛˇ","ㄉㄜ˙","ㄅㄠˇ","ㄨˋ","","","","ㄋㄧˊ","ㄎㄜˇ","ㄅㄚˇ","ㄅㄧㄥ","ㄑㄧˊ","ㄌㄧㄣˊ","ㄙㄨㄥˋ","ㄍㄟˇ","ㄊㄚ","","ㄉㄚˋ","ㄐㄧㄚ","ㄧˋ","ㄑㄧˇ","ㄕㄨㄛ","ㄏㄨㄚˋ","","ㄨㄢˊ","ㄧㄡˊ","ㄒㄧˋ","","ㄓㄨㄥ","ㄐㄧㄝˋ","ㄌㄨㄥˊ","ㄒㄧㄠˋ","ㄌㄜ˙","","ㄋㄚˊ","ㄔㄨ","ㄧˋ","ㄎㄜ","ㄏㄨㄟˋ","ㄈㄚ","ㄍㄨㄤ","ㄉㄜ˙","ㄕˊ","ㄊㄡ˙","","","ㄓㄜˋ","ㄐㄧㄡˋ","ㄕˋ","ㄌㄧㄥˊ","ㄏㄨㄣˊ","ㄓ","ㄍㄨㄤ","","ㄊㄚ","ㄅㄨˊ","ㄕˋ","ㄩㄥˋ","ㄌㄞˊ","ㄉㄚˇ","ㄐㄧㄚˋ","ㄉㄜ˙","","ㄦˊ","ㄕˋ","ㄊㄧˊ","ㄒㄧㄥˇ","ㄉㄚˋ","ㄐㄧㄚ","","ㄧㄠˋ","ㄧㄡˇ","ㄕㄢˋ","ㄌㄧㄤˊ","ㄉㄜ˙","ㄒㄧㄣ","","","","ㄋㄧˊ","ㄎㄜˇ","ㄕㄨㄛ","","","ㄩㄢˊ","ㄌㄞˊ","ㄓㄣ","ㄓㄥˋ","ㄉㄜ˙","ㄅㄠˇ","ㄨˋ","","ㄐㄧㄡˋ","ㄕˋ","ㄆㄥˊ","ㄧㄡˇ","","","ㄉㄚˋ","ㄐㄧㄚ","ㄎㄨㄞˋ","ㄌㄜˋ","ㄉㄜ˙","ㄏㄨㄟˊ","ㄐㄧㄚ","","ㄒㄧㄣ","ㄑㄧㄥˊ","ㄒㄧㄤˋ","ㄈㄟ","ㄑㄧˇ","ㄌㄞˊ","ㄧˊ","ㄧㄤˋ",""]},{"id":"school","title":"妮可的神奇方塊學校","short":"方塊學校","theme":"其他注音","subtitle":"日常詞語閱讀","emoji":"🏫","practice":"other","story":"冒險告一段落，妮可·懷特回到方塊學校。她翻開日曆，今天要辦一場魔術師表演。\n操場旁有一片草地，草地後面是山坡。坡上長著竹子，竹子旁有四根石頭柱子。太陽照著小池子，幾隻蝌蚪快樂地游來游去。\n婆婆抱來一條乾淨的被子，要給小貓午睡。她還帶來豌豆、叉子和杯子，準備大家的午餐。\n「你好！」魔術師向大家揮手。他摸摸耳朵，拿起魔法棒，居然變出一隻大白鵝！小兔嚇得顫抖，後來看見大白鵝扭來扭去，又笑了。\n大白鵝跳上桌，差點碰倒玻璃杯。妮可連忙把杯子移開，又拿抹布擦地，讓地板乾乾淨淨。\n學校角落還有一座用方塊做的佛祖雕像。婆婆告訴大家：「每一座作品都要愛護，也要尊重別人的心意。」\n表演結束，大家吃著豌豆，望著藍天，開心地說：「下次還要一起玩！」","readings":["ㄇㄠˋ","ㄒㄧㄢˇ","ㄍㄠˋ","ㄧ","ㄉㄨㄢˋ","ㄌㄨㄛˋ","","ㄋㄧˊ","ㄎㄜˇ","","ㄏㄨㄞˊ","ㄊㄜˋ","ㄏㄨㄟˊ","ㄉㄠˋ","ㄈㄤ","ㄎㄨㄞˋ","ㄒㄩㄝˊ","ㄒㄧㄠˋ","","ㄊㄚ","ㄈㄢ","ㄎㄞ","ㄖˋ","ㄌㄧˋ","","ㄐㄧㄣ","ㄊㄧㄢ","ㄧㄠˋ","ㄅㄢˋ","ㄧˋ","ㄔㄤˇ","ㄇㄛˊ","ㄕㄨˋ","ㄕ","ㄅㄧㄠˇ","ㄧㄢˇ","","","ㄘㄠ","ㄔㄤˇ","ㄆㄤˊ","ㄧㄡˇ","ㄧˊ","ㄆㄧㄢˋ","ㄘㄠˇ","ㄉㄧˋ","","ㄘㄠˇ","ㄉㄧˋ","ㄏㄡˋ","ㄇㄧㄢˋ","ㄕˋ","ㄕㄢ","ㄆㄛ","","ㄆㄛ","ㄕㄤˋ","ㄔㄤˊ","ㄓㄜ˙","ㄓㄨˊ","ㄗ˙","","ㄓㄨˊ","ㄗ˙","ㄆㄤˊ","ㄧㄡˇ","ㄙˋ","ㄍㄣ","ㄕˊ","ㄊㄡ˙","ㄓㄨˋ","ㄗ˙","","ㄊㄞˋ","ㄧㄤˊ","ㄓㄠˋ","ㄓㄜ˙","ㄒㄧㄠˇ","ㄔˊ","ㄗ","","ㄐㄧˇ","ㄓ","ㄎㄜ","ㄉㄡˇ","ㄎㄨㄞˋ","ㄌㄜˋ","ㄉㄜ˙","ㄧㄡˊ","ㄌㄞˊ","ㄧㄡˊ","ㄑㄩˋ","","","ㄆㄛˊ","ㄆㄛ˙","ㄅㄠˋ","ㄌㄞˊ","ㄧˋ","ㄊㄧㄠˊ","ㄍㄢ","ㄐㄧㄥˋ","ㄉㄜ˙","ㄅㄟˋ","ㄗ˙","","ㄧㄠˋ","ㄍㄟˇ","ㄒㄧㄠˇ","ㄇㄠ","ㄨˇ","ㄕㄨㄟˋ","","ㄊㄚ","ㄏㄞˊ","ㄉㄞˋ","ㄌㄞˊ","ㄨㄢ","ㄉㄡˋ","","ㄔㄚ","ㄗ˙","ㄏㄜˊ","ㄅㄟ","ㄗ˙","","ㄓㄨㄣˇ","ㄅㄟˋ","ㄉㄚˋ","ㄐㄧㄚ","ㄉㄜ˙","ㄨˇ","ㄘㄢ","","","","ㄋㄧˇ","ㄏㄠˇ","","","ㄇㄛˊ","ㄕㄨˋ","ㄕ","ㄒㄧㄤˋ","ㄉㄚˋ","ㄐㄧㄚ","ㄏㄨㄟ","ㄕㄡˇ","","ㄊㄚ","ㄇㄛ","ㄇㄛ","ㄦˇ","ㄉㄨㄛ˙","","ㄋㄚˊ","ㄑㄧˇ","ㄇㄛˊ","ㄈㄚˇ","ㄅㄤˋ","","ㄐㄩ","ㄖㄢˊ","ㄅㄧㄢˋ","ㄔㄨ","ㄧˋ","ㄓ","ㄉㄚˋ","ㄅㄞˊ","ㄜˊ","","ㄒㄧㄠˇ","ㄊㄨˋ","ㄒㄧㄚˋ","ㄉㄜ˙","ㄓㄢˋ","ㄉㄡˇ","","ㄏㄡˋ","ㄌㄞˊ","ㄎㄢˋ","ㄐㄧㄢˋ","ㄉㄚˋ","ㄅㄞˊ","ㄜˊ","ㄋㄧㄡˇ","ㄌㄞˊ","ㄋㄧㄡˇ","ㄑㄩˋ","","ㄧㄡˋ","ㄒㄧㄠˋ","ㄌㄜ˙","","","ㄉㄚˋ","ㄅㄞˊ","ㄜˊ","ㄊㄧㄠˋ","ㄕㄤˋ","ㄓㄨㄛ","","ㄔㄚˋ","ㄉㄧㄢˇ","ㄆㄥˋ","ㄉㄠˋ","ㄅㄛ","ㄌㄧˊ","ㄅㄟ","","ㄋㄧˊ","ㄎㄜˇ","ㄌㄧㄢˊ","ㄇㄤˊ","ㄅㄚˇ","ㄅㄟ","ㄗ˙","ㄧˊ","ㄎㄞ","","ㄧㄡˋ","ㄋㄚˊ","ㄇㄛˇ","ㄅㄨˋ","ㄘㄚ","ㄉㄧˋ","","ㄖㄤˋ","ㄉㄧˋ","ㄅㄢˇ","ㄍㄢ","ㄍㄢ","ㄐㄧㄥˋ","ㄐㄧㄥˋ","","","ㄒㄩㄝˊ","ㄒㄧㄠˋ","ㄐㄧㄠˇ","ㄌㄨㄛˋ","ㄏㄞˊ","ㄧㄡˇ","ㄧˊ","ㄗㄨㄛˋ","ㄩㄥˋ","ㄈㄤ","ㄎㄨㄞˋ","ㄗㄨㄛˋ","ㄉㄜ˙","ㄈㄛˊ","ㄗㄨˇ","ㄉㄧㄠ","ㄒㄧㄤˋ","","ㄆㄛˊ","ㄆㄛ˙","ㄍㄠˋ","ㄙㄨˋ","ㄉㄚˋ","ㄐㄧㄚ","","","ㄇㄟˇ","ㄧˊ","ㄗㄨㄛˋ","ㄗㄨㄛˋ","ㄆㄧㄣˇ","ㄉㄡ","ㄧㄠˋ","ㄞˋ","ㄏㄨˋ","","ㄧㄝˇ","ㄧㄠˋ","ㄗㄨㄣ","ㄓㄨㄥˋ","ㄅㄧㄝˊ","ㄖㄣˊ","ㄉㄜ˙","ㄒㄧㄣ","ㄧˋ","","","","ㄅㄧㄠˇ","ㄧㄢˇ","ㄐㄧㄝˊ","ㄕㄨˋ","","ㄉㄚˋ","ㄐㄧㄚ","ㄔ","ㄓㄜ˙","ㄨㄢ","ㄉㄡˋ","","ㄨㄤˋ","ㄓㄜ˙","ㄌㄢˊ","ㄊㄧㄢ","","ㄎㄞ","ㄒㄧㄣ","ㄉㄧˋ","ㄕㄨㄛ","","","ㄒㄧㄚˋ","ㄘˋ","ㄏㄞˊ","ㄧㄠˋ","ㄧˋ","ㄑㄧˇ","ㄨㄢˊ","",""]}],"vocab":["鳳梨","風箏","青蛙","眼鏡","蜻蜓","聽故事","風車","真正","整齊","清晨","叫醒","不倒翁","游泳","值日生","公雞","空中","蜜蜂","恐龍","花叢","小紅帽","燈籠","生日","等你來","星星","微風","輕輕吹","不停歇","心情","冰淇淋","貓頭鷹","老鷹","螢火蟲","大鯨魚","風鈴","一定","小熊","等你喔","邀請","慶祝","幸運","使用","燙平","蘋果","更正","小嬰兒","小金魚","看門","雪人","印章","白雲","什麼","跟著","怎麼","拼音","注音","身體","認真","真是美","森林","滾球","海豚","沉睡","一陣陣","運動","開心","小音符","音樂","我們","你好","靈魂","輪胎","軍人","被子","園中","穿新衣","新年","彈鋼琴","今天","伸長脖子","地震","顫抖","蝌蚪","日曆","魔術師","耳朵","大白鵝","兒童","嬰兒","太陽","貓熊","豌豆","竹子","柱子","操場","叉子","擦地","草地","山坡","玻璃杯","抹布","婆婆","佛祖","疼痛","好冷","杯子","東西"],"groupedSource":[["鳳梨","風箏","青蛙","眼鏡","蜻蜓","聽故事","風車","真正","整齊","清晨","叫醒","不倒翁","游泳","值日生","公雞"],["空中","蜜蜂","恐龍","花叢","小紅帽","燈籠","生日","等你來","星星","微風","輕輕吹","不停歇","心情","冰淇淋","貓頭鷹","老鷹"],["螢火蟲","大鯨魚","風鈴","一定","小熊","等你喔","邀請","慶祝","幸運","使用","燙平","蘋果","更正","小嬰兒"],["小金魚","看門","雪人","印章","白雲","什麼","跟著","怎麼","拼音","注音","身體","認真","真正","真是美","森林","滾球","海豚"],["清晨","沉睡","一陣陣","運動","開心","小音符","音樂","我們","你好","冰淇淋","靈魂","輪胎","軍人","被子","園中"],["穿新衣","新年","彈鋼琴","今天","幸運","伸長脖子","地震","顫抖"],["蝌蚪","日曆","魔術師","耳朵","大白鵝","兒童","嬰兒","游泳","太陽","不倒翁","貓熊","豌豆","竹子","柱子","操場"],["叉子","擦地","草地","山坡","玻璃杯","抹布","婆婆","佛祖","疼痛","好冷","杯子","東西"]],"wordReadings":{"鳳梨":["ㄈㄥˋ","ㄌㄧˊ"],"風箏":["ㄈㄥ","ㄓㄥ"],"青蛙":["ㄑㄧㄥ","ㄨㄚ"],"眼鏡":["ㄧㄢˇ","ㄐㄧㄥˋ"],"蜻蜓":["ㄑㄧㄥ","ㄊㄧㄥˊ"],"聽故事":["ㄊㄧㄥ","ㄍㄨˋ","ㄕˋ"],"風車":["ㄈㄥ","ㄔㄜ"],"真正":["ㄓㄣ","ㄓㄥˋ"],"整齊":["ㄓㄥˇ","ㄑㄧˊ"],"清晨":["ㄑㄧㄥ","ㄔㄣˊ"],"叫醒":["ㄐㄧㄠˋ","ㄒㄧㄥˇ"],"不倒翁":["ㄅㄨˋ","ㄉㄠˇ","ㄨㄥ"],"游泳":["ㄧㄡˊ","ㄩㄥˇ"],"值日生":["ㄓˊ","ㄖˋ","ㄕㄥ"],"公雞":["ㄍㄨㄥ","ㄐㄧ"],"空中":["ㄎㄨㄥ","ㄓㄨㄥ"],"蜜蜂":["ㄇㄧˋ","ㄈㄥ"],"恐龍":["ㄎㄨㄥˇ","ㄌㄨㄥˊ"],"花叢":["ㄏㄨㄚ","ㄘㄨㄥˊ"],"小紅帽":["ㄒㄧㄠˇ","ㄏㄨㄥˊ","ㄇㄠˋ"],"燈籠":["ㄉㄥ","ㄌㄨㄥˊ"],"生日":["ㄕㄥ","ㄖˋ"],"等你來":["ㄉㄥˇ","ㄋㄧˇ","ㄌㄞˊ"],"星星":["ㄒㄧㄥ","ㄒㄧㄥ˙"],"微風":["ㄨㄟˊ","ㄈㄥ"],"輕輕吹":["ㄑㄧㄥ","ㄑㄧㄥ","ㄔㄨㄟ"],"不停歇":["ㄅㄨˋ","ㄊㄧㄥˊ","ㄒㄧㄝ"],"心情":["ㄒㄧㄣ","ㄑㄧㄥˊ"],"冰淇淋":["ㄅㄧㄥ","ㄑㄧˊ","ㄌㄧㄣˊ"],"貓頭鷹":["ㄇㄠ","ㄊㄡˊ","ㄧㄥ"],"老鷹":["ㄌㄠˇ","ㄧㄥ"],"螢火蟲":["ㄧㄥˊ","ㄏㄨㄛˇ","ㄔㄨㄥˊ"],"大鯨魚":["ㄉㄚˋ","ㄐㄧㄥ","ㄩˊ"],"風鈴":["ㄈㄥ","ㄌㄧㄥˊ"],"一定":["ㄧˊ","ㄉㄧㄥˋ"],"小熊":["ㄒㄧㄠˇ","ㄒㄩㄥˊ"],"等你喔":["ㄉㄥˇ","ㄋㄧˇ","ㄛ"],"邀請":["ㄧㄠ","ㄑㄧㄥˇ"],"慶祝":["ㄑㄧㄥˋ","ㄓㄨˋ"],"幸運":["ㄒㄧㄥˋ","ㄩㄣˋ"],"使用":["ㄕˇ","ㄩㄥˋ"],"燙平":["ㄊㄤˋ","ㄆㄧㄥˊ"],"蘋果":["ㄆㄧㄥˊ","ㄍㄨㄛˇ"],"更正":["ㄍㄥ","ㄓㄥˋ"],"小嬰兒":["ㄒㄧㄠˇ","ㄧㄥ","ㄦˊ"],"小金魚":["ㄒㄧㄠˇ","ㄐㄧㄣ","ㄩˊ"],"看門":["ㄎㄢ","ㄇㄣˊ"],"雪人":["ㄒㄩㄝˇ","ㄖㄣˊ"],"印章":["ㄧㄣˋ","ㄓㄤ"],"白雲":["ㄅㄞˊ","ㄩㄣˊ"],"什麼":["ㄕㄣˊ","ㄇㄜ˙"],"跟著":["ㄍㄣ","ㄓㄜ˙"],"怎麼":["ㄗㄣˇ","ㄇㄜ˙"],"拼音":["ㄆㄧㄣ","ㄧㄣ"],"注音":["ㄓㄨˋ","ㄧㄣ"],"身體":["ㄕㄣ","ㄊㄧˇ"],"認真":["ㄖㄣˋ","ㄓㄣ"],"真是美":["ㄓㄣ","ㄕˋ","ㄇㄟˇ"],"森林":["ㄙㄣ","ㄌㄧㄣˊ"],"滾球":["ㄍㄨㄣˇ","ㄑㄧㄡˊ"],"海豚":["ㄏㄞˇ","ㄊㄨㄣˊ"],"沉睡":["ㄔㄣˊ","ㄕㄨㄟˋ"],"一陣陣":["ㄧˊ","ㄓㄣˋ","ㄓㄣˋ"],"運動":["ㄩㄣˋ","ㄉㄨㄥˋ"],"開心":["ㄎㄞ","ㄒㄧㄣ"],"小音符":["ㄒㄧㄠˇ","ㄧㄣ","ㄈㄨˊ"],"音樂":["ㄧㄣ","ㄩㄝˋ"],"我們":["ㄨㄛˇ","ㄇㄣ˙"],"你好":["ㄋㄧˇ","ㄏㄠˇ"],"靈魂":["ㄌㄧㄥˊ","ㄏㄨㄣˊ"],"輪胎":["ㄌㄨㄣˊ","ㄊㄞ"],"軍人":["ㄐㄩㄣ","ㄖㄣˊ"],"被子":["ㄅㄟˋ","ㄗ˙"],"園中":["ㄩㄢˊ","ㄓㄨㄥ"],"穿新衣":["ㄔㄨㄢ","ㄒㄧㄣ","ㄧ"],"新年":["ㄒㄧㄣ","ㄋㄧㄢˊ"],"彈鋼琴":["ㄊㄢˊ","ㄍㄤ","ㄑㄧㄣˊ"],"今天":["ㄐㄧㄣ","ㄊㄧㄢ"],"伸長脖子":["ㄕㄣ","ㄔㄤˊ","ㄅㄛˊ","ㄗ˙"],"地震":["ㄉㄧˋ","ㄓㄣˋ"],"顫抖":["ㄓㄢˋ","ㄉㄡˇ"],"蝌蚪":["ㄎㄜ","ㄉㄡˇ"],"日曆":["ㄖˋ","ㄌㄧˋ"],"魔術師":["ㄇㄛˊ","ㄕㄨˋ","ㄕ"],"耳朵":["ㄦˇ","ㄉㄨㄛ˙"],"大白鵝":["ㄉㄚˋ","ㄅㄞˊ","ㄜˊ"],"兒童":["ㄦˊ","ㄊㄨㄥˊ"],"嬰兒":["ㄧㄥ","ㄦˊ"],"太陽":["ㄊㄞˋ","ㄧㄤˊ"],"貓熊":["ㄇㄠ","ㄒㄩㄥˊ"],"豌豆":["ㄨㄢ","ㄉㄡˋ"],"竹子":["ㄓㄨˊ","ㄗ˙"],"柱子":["ㄓㄨˋ","ㄗ˙"],"操場":["ㄘㄠ","ㄔㄤˇ"],"叉子":["ㄔㄚ","ㄗ˙"],"擦地":["ㄘㄚ","ㄉㄧˋ"],"草地":["ㄘㄠˇ","ㄉㄧˋ"],"山坡":["ㄕㄢ","ㄆㄛ"],"玻璃杯":["ㄅㄛ","ㄌㄧˊ","ㄅㄟ"],"抹布":["ㄇㄛˇ","ㄅㄨˋ"],"婆婆":["ㄆㄛˊ","ㄆㄛ˙"],"佛祖":["ㄈㄛˊ","ㄗㄨˇ"],"疼痛":["ㄊㄥˊ","ㄊㄨㄥˋ"],"好冷":["ㄏㄠˇ","ㄌㄥˇ"],"杯子":["ㄅㄟ","ㄗ˙"],"東西":["ㄉㄨㄥ","ㄒㄧ˙"]},"charReadings":{"一":"ㄧ","三":"ㄙㄢ","上":"ㄕㄤˋ","下":"ㄒㄧㄚˋ","不":"ㄅㄨˋ","中":"ㄓㄨㄥ","久":"ㄐㄧㄡˇ","之":"ㄓ","乖":"ㄍㄨㄞ","也":"ㄧㄝˇ","乾":"ㄑㄧㄢˊ","了":"ㄌㄜ˙","事":"ㄕˋ","二":"ㄦˋ","亮":"ㄌㄧㄤˋ","人":"ㄖㄣˊ","什":"ㄕㄣˊ","今":"ㄐㄧㄣ","他":"ㄊㄚ","以":"ㄧˇ","休":"ㄒㄧㄡ","伸":"ㄕㄣ","位":"ㄨㄟˋ","低":"ㄉㄧ","佛":"ㄈㄨˊ","作":"ㄗㄨㄛˋ","你":"ㄋㄧˇ","使":"ㄕˇ","來":"ㄌㄞˊ","個":"ㄍㄜˋ","們":"ㄇㄣ˙","倒":"ㄉㄠˋ","值":"ㄓˊ","做":"ㄗㄨㄛˋ","停":"ㄊㄧㄥˊ","備":"ㄅㄟˋ","像":"ㄒㄧㄤˋ","先":"ㄒㄧㄢ","光":"ㄍㄨㄤ","兒":"ㄦˊ","兔":"ㄊㄨˋ","入":"ㄖㄨˋ","公":"ㄍㄨㄥ","再":"ㄗㄞˋ","冒":"ㄇㄠˋ","冰":"ㄅㄧㄥ","冷":"ㄌㄥˇ","出":"ㄔㄨ","別":"ㄅㄧㄝˊ","到":"ㄉㄠˋ","前":"ㄑㄧㄢˊ","剛":"ㄍㄤ","功":"ㄍㄨㄥ","加":"ㄐㄧㄚ","勇":"ㄩㄥˇ","動":"ㄉㄨㄥˋ","包":"ㄅㄠ","午":"ㄨˇ","卡":"ㄎㄚˇ","印":"ㄧㄣˋ","卻":"ㄑㄩㄝˋ","原":"ㄩㄢˊ","去":"ㄑㄩˋ","參":"ㄘㄢ","又":"ㄧㄡˋ","叉":"ㄔㄚ","友":"ㄧㄡˇ","叢":"ㄘㄨㄥˊ","口":"ㄎㄡˇ","只":"ㄓˇ","叫":"ㄐㄧㄠˋ","叮":"ㄉㄧㄥ","可":"ㄎㄜˇ","台":"ㄊㄞˊ","吃":"ㄔ","向":"ㄒㄧㄤˋ","吧":"ㄅㄚ˙","吹":"ㄔㄨㄟ","告":"ㄍㄠˋ","和":"ㄏㄜˊ","品":"ㄆㄧㄣˇ","哈":"ㄏㄚ","哼":"ㄏㄥ","問":"ㄨㄣˋ","善":"ㄕㄢˋ","喔":"ㄛ","嗎":"ㄇㄚ˙","嚇":"ㄒㄧㄚˋ","四":"ㄙˋ","回":"ㄏㄨㄟˊ","園":"ㄩㄢˊ","圓":"ㄩㄢˊ","圖":"ㄊㄨˊ","在":"ㄗㄞˋ","地":"ㄉㄧˋ","坐":"ㄗㄨㄛˋ","坡":"ㄆㄛ","場":"ㄔㄤˇ","塊":"ㄎㄨㄞˋ","塔":"ㄊㄚˇ","外":"ㄨㄞˋ","夜":"ㄧㄝˋ","大":"ㄉㄚˋ","天":"ㄊㄧㄢ","太":"ㄊㄞˋ","她":"ㄊㄚ","好":"ㄏㄠˇ","妮":"ㄋㄧˊ","婆":"ㄆㄛˊ","嬰":"ㄧㄥ","子":"ㄗ","學":"ㄒㄩㄝˊ","它":"ㄊㄚ","定":"ㄉㄧㄥˋ","家":"ㄐㄧㄚ","寫":"ㄒㄧㄝˇ","寶":"ㄅㄠˇ","尊":"ㄗㄨㄣ","對":"ㄉㄨㄟˋ","小":"ㄒㄧㄠˇ","就":"ㄐㄧㄡˋ","居":"ㄐㄩ","山":"ㄕㄢ","差":"ㄔㄚˋ","布":"ㄅㄨˋ","師":"ㄕ","帶":"ㄉㄞˋ","帽":"ㄇㄠˋ","幫":"ㄅㄤ","平":"ㄆㄧㄥˊ","年":"ㄋㄧㄢˊ","幸":"ㄒㄧㄥˋ","幾":"ㄐㄧˇ","座":"ㄗㄨㄛˋ","張":"ㄓㄤ","彈":"ㄊㄢˊ","往":"ㄨㄤˇ","很":"ㄏㄣˇ","後":"ㄏㄡˋ","得":"ㄉㄜ˙","從":"ㄘㄨㄥˊ","微":"ㄨㄟ","心":"ㄒㄧㄣ","忙":"ㄇㄤˊ","快":"ㄎㄨㄞˋ","忽":"ㄏㄨ","怎":"ㄗㄣˇ","急":"ㄐㄧˊ","怪":"ㄍㄨㄞˋ","恐":"ㄎㄨㄥˇ","息":"ㄒㄧ","情":"ㄑㄧㄥˊ","想":"ㄒㄧㄤˇ","意":"ㄧˋ","愛":"ㄞˋ","慶":"ㄑㄧㄥˋ","懷":"ㄏㄨㄞˊ","成":"ㄔㄥˊ","我":"ㄨㄛˇ","戲":"ㄒㄧˋ","戴":"ㄉㄞˋ","扇":"ㄕㄢˋ","手":"ㄕㄡˇ","才":"ㄘㄞˊ","打":"ㄉㄚˇ","扭":"ㄋㄧㄡˇ","扮":"ㄅㄢˋ","扶":"ㄈㄨˊ","找":"ㄓㄠˇ","把":"ㄅㄚˇ","抓":"ㄓㄨㄚ","抖":"ㄉㄡˇ","抱":"ㄅㄠˋ","抹":"ㄇㄛˇ","拼":"ㄆㄧㄣ","拿":"ㄋㄚˊ","掛":"ㄍㄨㄚˋ","提":"ㄊㄧˊ","揮":"ㄏㄨㄟ","搖":"ㄧㄠˊ","搗":"ㄉㄠˇ","搶":"ㄑㄧㄤˇ","摸":"ㄇㄛ","操":"ㄘㄠ","擦":"ㄘㄚ","放":"ㄈㄤˋ","故":"ㄍㄨˋ","敢":"ㄍㄢˇ","整":"ㄓㄥˇ","新":"ㄒㄧㄣ","方":"ㄈㄤ","於":"ㄩˊ","旁":"ㄆㄤˊ","旅":"ㄌㄩˇ","日":"ㄖˋ","星":"ㄒㄧㄥ","是":"ㄕˋ","晃":"ㄏㄨㄤˇ","晨":"ㄔㄣˊ","曆":"ㄌㄧˋ","更":"ㄍㄥˋ","會":"ㄏㄨㄟˋ","有":"ㄧㄡˇ","朋":"ㄆㄥˊ","望":"ㄨㄤˋ","朵":"ㄉㄨㄛˇ","村":"ㄘㄨㄣ","束":"ㄕㄨˋ","杯":"ㄅㄟ","東":"ㄉㄨㄥ","板":"ㄅㄢˇ","林":"ㄌㄧㄣˊ","果":"ㄍㄨㄛˇ","架":"ㄐㄧㄚˋ","柔":"ㄖㄡˊ","柱":"ㄓㄨˋ","校":"ㄒㄧㄠˋ","根":"ㄍㄣ","桌":"ㄓㄨㄛ","條":"ㄊㄧㄠˊ","梨":"ㄌㄧˊ","棒":"ㄅㄤˋ","森":"ㄙㄣ","極":"ㄐㄧˊ","樂":"ㄌㄜˋ","樣":"ㄧㄤˋ","樹":"ㄕㄨˋ","次":"ㄘˋ","歇":"ㄒㄧㄝ","歌":"ㄍㄜ","正":"ㄓㄥˋ","步":"ㄅㄨˋ","段":"ㄉㄨㄢˋ","每":"ㄇㄟˇ","民":"ㄇㄧㄣˊ","氣":"ㄑㄧˋ","水":"ㄕㄨㄟˇ","池":"ㄔˊ","沉":"ㄔㄣˊ","沒":"ㄇㄟˊ","法":"ㄈㄚˇ","注":"ㄓㄨˋ","泳":"ㄩㄥˇ","洞":"ㄉㄨㄥˋ","派":"ㄆㄞˋ","海":"ㄏㄞˇ","淇":"ㄑㄧˊ","淋":"ㄌㄧㄣˊ","淨":"ㄐㄧㄥˋ","清":"ㄑㄧㄥ","游":"ㄧㄡˊ","準":"ㄓㄨㄣˇ","溪":"ㄒㄧ","滾":"ㄍㄨㄣˇ","漂":"ㄆㄧㄠˋ","演":"ㄧㄢˇ","火":"ㄏㄨㄛˇ","為":"ㄨㄟˋ","然":"ㄖㄢˊ","煙":"ㄧㄢ","照":"ㄓㄠˋ","熊":"ㄒㄩㄥˊ","燈":"ㄉㄥ","燙":"ㄊㄤˋ","牆":"ㄑㄧㄤˊ","片":"ㄆㄧㄢˋ","牌":"ㄆㄞˊ","牠":"ㄊㄚ","物":"ㄨˋ","特":"ㄊㄜˋ","玩":"ㄨㄢˊ","玻":"ㄅㄛ","球":"ㄑㄧㄡˊ","琴":"ㄑㄧㄣˊ","璃":"ㄌㄧˊ","生":"ㄕㄥ","用":"ㄩㄥˋ","界":"ㄐㄧㄝˋ","疼":"ㄊㄥˊ","痛":"ㄊㄨㄥˋ","發":"ㄈㄚ","白":"ㄅㄞˊ","的":"ㄉㄜ˙","盒":"ㄏㄜˊ","直":"ㄓˊ","看":"ㄎㄢˋ","真":"ㄓㄣ","眼":"ㄧㄢˇ","睡":"ㄕㄨㄟˋ","石":"ㄕˊ","碰":"ㄆㄥˋ","示":"ㄕˋ","祖":"ㄗㄨˇ","祝":"ㄓㄨˋ","禮":"ㄌㄧˇ","移":"ㄧˊ","穩":"ㄨㄣˇ","空":"ㄎㄨㄥ","穿":"ㄔㄨㄢ","窗":"ㄔㄨㄤ","立":"ㄌㄧˋ","站":"ㄓㄢˋ","竟":"ㄐㄧㄥˋ","章":"ㄓㄤ","童":"ㄊㄨㄥˊ","竹":"ㄓㄨˊ","笑":"ㄒㄧㄠˋ","符":"ㄈㄨˊ","第":"ㄉㄧˋ","等":"ㄉㄥˇ","箏":"ㄓㄥ","籠":"ㄌㄨㄥˊ","紅":"ㄏㄨㄥˊ","終":"ㄓㄨㄥ","結":"ㄐㄧㄝˊ","給":"ㄍㄟˇ","緊":"ㄐㄧㄣˇ","繼":"ㄐㄧˋ","續":"ㄒㄩˋ","美":"ㄇㄟˇ","翁":"ㄨㄥ","翅":"ㄔˋ","翻":"ㄈㄢ","老":"ㄌㄠˇ","者":"ㄓㄜˇ","而":"ㄦˊ","耳":"ㄦˇ","聲":"ㄕㄥ","聽":"ㄊㄧㄥ","背":"ㄅㄟˋ","胎":"ㄊㄞ","能":"ㄋㄥˊ","脖":"ㄅㄛˊ","腳":"ㄐㄧㄠˇ","膀":"ㄅㄤˇ","興":"ㄒㄧㄥˋ","舊":"ㄐㄧㄡˋ","良":"ㄌㄧㄤˊ","色":"ㄙㄜˋ","花":"ㄏㄨㄚ","草":"ㄘㄠˇ","莊":"ㄓㄨㄤ","落":"ㄌㄨㄛˋ","著":"ㄓㄜ˙","蓋":"ㄍㄞˋ","藍":"ㄌㄢˊ","蘋":"ㄆㄧㄥˊ","蚪":"ㄉㄡˇ","蛋":"ㄉㄢˋ","蛙":"ㄨㄚ","蜂":"ㄈㄥ","蜓":"ㄊㄧㄥˊ","蜜":"ㄇㄧˋ","蜻":"ㄑㄧㄥ","蝌":"ㄎㄜ","螢":"ㄧㄥˊ","蟲":"ㄔㄨㄥˊ","行":"ㄒㄧㄥˊ","術":"ㄕㄨˋ","衣":"ㄧ","表":"ㄅㄧㄠˇ","被":"ㄅㄟˋ","裡":"ㄌㄧˇ","西":"ㄒㄧ","要":"ㄧㄠˋ","見":"ㄐㄧㄢˋ","覺":"ㄐㄩㄝˊ","角":"ㄐㄧㄠˇ","訴":"ㄙㄨˋ","話":"ㄏㄨㄚˋ","認":"ㄖㄣˋ","說":"ㄕㄨㄛ","請":"ㄑㄧㄥˇ","護":"ㄏㄨˋ","讀":"ㄉㄨˊ","變":"ㄅㄧㄢˋ","讓":"ㄖㄤˋ","豆":"ㄉㄡˋ","豌":"ㄨㄢ","豚":"ㄊㄨㄣˊ","貌":"ㄇㄠˋ","貓":"ㄇㄠ","走":"ㄗㄡˇ","起":"ㄑㄧˇ","跑":"ㄆㄠˇ","跟":"ㄍㄣ","跳":"ㄊㄧㄠˋ","身":"ㄕㄣ","躺":"ㄊㄤˇ","車":"ㄔㄜ","軍":"ㄐㄩㄣ","輕":"ㄑㄧㄥ","輪":"ㄌㄨㄣˊ","轉":"ㄓㄨㄢˇ","辦":"ㄅㄢˋ","近":"ㄐㄧㄣˋ","送":"ㄙㄨㄥˋ","逗":"ㄉㄡˋ","這":"ㄓㄜˋ","通":"ㄊㄨㄥ","連":"ㄌㄧㄢˊ","進":"ㄐㄧㄣˋ","遊":"ㄧㄡˊ","運":"ㄩㄣˋ","過":"ㄍㄨㄛˋ","邀":"ㄧㄠ","還":"ㄏㄞˊ","邊":"ㄅㄧㄢ","那":"ㄋㄚˋ","都":"ㄉㄡ","醒":"ㄒㄧㄥˇ","重":"ㄓㄨㄥˋ","金":"ㄐㄧㄣ","鈴":"ㄌㄧㄥˊ","鋼":"ㄍㄤ","錯":"ㄘㄨㄛˋ","鏡":"ㄐㄧㄥˋ","長":"ㄔㄤˊ","門":"ㄇㄣˊ","開":"ㄎㄞ","陣":"ㄓㄣˋ","陽":"ㄧㄤˊ","險":"ㄒㄧㄢˇ","隻":"ㄓ","雕":"ㄉㄧㄠ","雞":"ㄐㄧ","雪":"ㄒㄩㄝˇ","雲":"ㄩㄣˊ","震":"ㄓㄣˋ","靈":"ㄌㄧㄥˊ","青":"ㄑㄧㄥ","面":"ㄇㄧㄢˋ","音":"ㄧㄣ","響":"ㄒㄧㄤˇ","頭":"ㄊㄡˊ","顆":"ㄎㄜ","顫":"ㄔㄢˋ","風":"ㄈㄥ","飄":"ㄆㄧㄠ","飛":"ㄈㄟ","餐":"ㄘㄢ","首":"ㄕㄡˇ","體":"ㄊㄧˇ","高":"ㄍㄠ","魂":"ㄏㄨㄣˊ","魔":"ㄇㄛˊ","魚":"ㄩˊ","鯨":"ㄐㄧㄥ","鳳":"ㄈㄥˋ","鵝":"ㄜˊ","鷹":"ㄧㄥ","麼":"ㄇㄜ˙","黑":"ㄏㄟ","點":"ㄉㄧㄢˇ","齊":"ㄑㄧˊ","龍":"ㄌㄨㄥˊ"},"phrases":{"鳳梨":"ㄈㄥˋ ㄌㄧˊ","風箏":"ㄈㄥ ㄓㄥ","青蛙":"ㄑㄧㄥ ㄨㄚ","眼鏡":"ㄧㄢˇ ㄐㄧㄥˋ","蜻蜓":"ㄑㄧㄥ ㄊㄧㄥˊ","聽故事":"ㄊㄧㄥ ㄍㄨˋ ㄕˋ","風車":"ㄈㄥ ㄔㄜ","真正":"ㄓㄣ ㄓㄥˋ","整齊":"ㄓㄥˇ ㄑㄧˊ","清晨":"ㄑㄧㄥ ㄔㄣˊ","叫醒":"ㄐㄧㄠˋ ㄒㄧㄥˇ","不倒翁":"ㄅㄨˋ ㄉㄠˇ ㄨㄥ","游泳":"ㄧㄡˊ ㄩㄥˇ","值日生":"ㄓˊ ㄖˋ ㄕㄥ","公雞":"ㄍㄨㄥ ㄐㄧ","空中":"ㄎㄨㄥ ㄓㄨㄥ","蜜蜂":"ㄇㄧˋ ㄈㄥ","恐龍":"ㄎㄨㄥˇ ㄌㄨㄥˊ","花叢":"ㄏㄨㄚ ㄘㄨㄥˊ","小紅帽":"ㄒㄧㄠˇ ㄏㄨㄥˊ ㄇㄠˋ","燈籠":"ㄉㄥ ㄌㄨㄥˊ","生日":"ㄕㄥ ㄖˋ","等你來":"ㄉㄥˇ ㄋㄧˇ ㄌㄞˊ","星星":"ㄒㄧㄥ ㄒㄧㄥ˙","微風":"ㄨㄟˊ ㄈㄥ","輕輕吹":"ㄑㄧㄥ ㄑㄧㄥ ㄔㄨㄟ","不停歇":"ㄅㄨˋ ㄊㄧㄥˊ ㄒㄧㄝ","心情":"ㄒㄧㄣ ㄑㄧㄥˊ","冰淇淋":"ㄅㄧㄥ ㄑㄧˊ ㄌㄧㄣˊ","貓頭鷹":"ㄇㄠ ㄊㄡˊ ㄧㄥ","老鷹":"ㄌㄠˇ ㄧㄥ","螢火蟲":"ㄧㄥˊ ㄏㄨㄛˇ ㄔㄨㄥˊ","大鯨魚":"ㄉㄚˋ ㄐㄧㄥ ㄩˊ","風鈴":"ㄈㄥ ㄌㄧㄥˊ","一定":"ㄧˊ ㄉㄧㄥˋ","小熊":"ㄒㄧㄠˇ ㄒㄩㄥˊ","等你喔":"ㄉㄥˇ ㄋㄧˇ ㄛ","邀請":"ㄧㄠ ㄑㄧㄥˇ","慶祝":"ㄑㄧㄥˋ ㄓㄨˋ","幸運":"ㄒㄧㄥˋ ㄩㄣˋ","使用":"ㄕˇ ㄩㄥˋ","燙平":"ㄊㄤˋ ㄆㄧㄥˊ","蘋果":"ㄆㄧㄥˊ ㄍㄨㄛˇ","更正":"ㄍㄥ ㄓㄥˋ","小嬰兒":"ㄒㄧㄠˇ ㄧㄥ ㄦˊ","小金魚":"ㄒㄧㄠˇ ㄐㄧㄣ ㄩˊ","看門":"ㄎㄢ ㄇㄣˊ","雪人":"ㄒㄩㄝˇ ㄖㄣˊ","印章":"ㄧㄣˋ ㄓㄤ","白雲":"ㄅㄞˊ ㄩㄣˊ","什麼":"ㄕㄣˊ ㄇㄜ˙","跟著":"ㄍㄣ ㄓㄜ˙","怎麼":"ㄗㄣˇ ㄇㄜ˙","拼音":"ㄆㄧㄣ ㄧㄣ","注音":"ㄓㄨˋ ㄧㄣ","身體":"ㄕㄣ ㄊㄧˇ","認真":"ㄖㄣˋ ㄓㄣ","真是美":"ㄓㄣ ㄕˋ ㄇㄟˇ","森林":"ㄙㄣ ㄌㄧㄣˊ","滾球":"ㄍㄨㄣˇ ㄑㄧㄡˊ","海豚":"ㄏㄞˇ ㄊㄨㄣˊ","沉睡":"ㄔㄣˊ ㄕㄨㄟˋ","一陣陣":"ㄧˊ ㄓㄣˋ ㄓㄣˋ","運動":"ㄩㄣˋ ㄉㄨㄥˋ","開心":"ㄎㄞ ㄒㄧㄣ","小音符":"ㄒㄧㄠˇ ㄧㄣ ㄈㄨˊ","音樂":"ㄧㄣ ㄩㄝˋ","我們":"ㄨㄛˇ ㄇㄣ˙","你好":"ㄋㄧˇ ㄏㄠˇ","靈魂":"ㄌㄧㄥˊ ㄏㄨㄣˊ","輪胎":"ㄌㄨㄣˊ ㄊㄞ","軍人":"ㄐㄩㄣ ㄖㄣˊ","被子":"ㄅㄟˋ ㄗ˙","園中":"ㄩㄢˊ ㄓㄨㄥ","穿新衣":"ㄔㄨㄢ ㄒㄧㄣ ㄧ","新年":"ㄒㄧㄣ ㄋㄧㄢˊ","彈鋼琴":"ㄊㄢˊ ㄍㄤ ㄑㄧㄣˊ","今天":"ㄐㄧㄣ ㄊㄧㄢ","伸長脖子":"ㄕㄣ ㄔㄤˊ ㄅㄛˊ ㄗ˙","地震":"ㄉㄧˋ ㄓㄣˋ","顫抖":"ㄓㄢˋ ㄉㄡˇ","蝌蚪":"ㄎㄜ ㄉㄡˇ","日曆":"ㄖˋ ㄌㄧˋ","魔術師":"ㄇㄛˊ ㄕㄨˋ ㄕ","耳朵":"ㄦˇ ㄉㄨㄛ˙","大白鵝":"ㄉㄚˋ ㄅㄞˊ ㄜˊ","兒童":"ㄦˊ ㄊㄨㄥˊ","嬰兒":"ㄧㄥ ㄦˊ","太陽":"ㄊㄞˋ ㄧㄤˊ","貓熊":"ㄇㄠ ㄒㄩㄥˊ","豌豆":"ㄨㄢ ㄉㄡˋ","竹子":"ㄓㄨˊ ㄗ˙","柱子":"ㄓㄨˋ ㄗ˙","操場":"ㄘㄠ ㄔㄤˇ","叉子":"ㄔㄚ ㄗ˙","擦地":"ㄘㄚ ㄉㄧˋ","草地":"ㄘㄠˇ ㄉㄧˋ","山坡":"ㄕㄢ ㄆㄛ","玻璃杯":"ㄅㄛ ㄌㄧˊ ㄅㄟ","抹布":"ㄇㄛˇ ㄅㄨˋ","婆婆":"ㄆㄛˊ ㄆㄛ˙","佛祖":"ㄈㄛˊ ㄗㄨˇ","疼痛":"ㄊㄥˊ ㄊㄨㄥˋ","好冷":"ㄏㄠˇ ㄌㄥˇ","杯子":"ㄅㄟ ㄗ˙","東西":"ㄉㄨㄥ ㄒㄧ˙","妮可·懷特":"ㄋㄧˊ ㄎㄜˇ · ㄏㄨㄞˊ ㄊㄜˋ","終界使者":"ㄓㄨㄥ ㄐㄧㄝˋ ㄕˇ ㄓㄜˇ","終界龍":"ㄓㄨㄥ ㄐㄧㄝˋ ㄌㄨㄥˊ","終界":"ㄓㄨㄥ ㄐㄧㄝˋ","乾淨":"ㄍㄢ ㄐㄧㄥˋ","乾乾淨淨":"ㄍㄢ ㄍㄢ ㄐㄧㄥˋ ㄐㄧㄥˋ","很高興":"ㄏㄣˇ ㄍㄠ ㄒㄧㄥˋ","孩子":"ㄏㄞˊ ㄗ˙","村子":"ㄘㄨㄣ ㄗ˙","村莊":"ㄘㄨㄣ ㄓㄨㄤ","小貓":"ㄒㄧㄠˇ ㄇㄠ","花園中":"ㄏㄨㄚ ㄩㄢˊ ㄓㄨㄥ","一位":"ㄧˊ ㄨㄟˋ","一個":"ㄧˊ ㄍㄜ˙","一張":"ㄧˋ ㄓㄤ","一隻":"ㄧˋ ㄓ","一片":"ㄧˊ ㄆㄧㄢˋ","一台":"ㄧˋ ㄊㄞˊ","一盒":"ㄧˋ ㄏㄜˊ","一包":"ㄧˋ ㄅㄠ","一顆":"ㄧˋ ㄎㄜ","一扇":"ㄧˊ ㄕㄢˋ","一條":"ㄧˋ ㄊㄧㄠˊ","一座":"ㄧˊ ㄗㄨㄛˋ","一場":"ㄧˋ ㄔㄤˇ","一根":"ㄧˋ ㄍㄣ","一起":"ㄧˋ ㄑㄧˇ","一下":"ㄧˊ ㄒㄧㄚˋ","一樣":"ㄧˊ ㄧㄤˋ","一點":"ㄧˋ ㄉㄧㄢˇ","一首":"ㄧˋ ㄕㄡˇ","一直":"ㄧˋ ㄓˊ","一位村民":"ㄧˊ ㄨㄟˋ ㄘㄨㄣ ㄇㄧㄣˊ","不是":"ㄅㄨˊ ㄕˋ","不會":"ㄅㄨˊ ㄏㄨㄟˋ","看見":"ㄎㄢˋ ㄐㄧㄢˋ","看著":"ㄎㄢˋ ㄓㄜ˙","拿著":"ㄋㄚˊ ㄓㄜ˙","抱著":"ㄅㄠˋ ㄓㄜ˙","背著":"ㄅㄟ ㄓㄜ˙","睡著":"ㄕㄨㄟˋ ㄓㄠˊ","笑著":"ㄒㄧㄠˋ ㄓㄜ˙","吃著":"ㄔ ㄓㄜ˙","叫著":"ㄐㄧㄠˋ ㄓㄜ˙","走著":"ㄗㄡˇ ㄓㄜ˙","望著":"ㄨㄤˋ ㄓㄜ˙","站穩":"ㄓㄢˋ ㄨㄣˇ","繼續":"ㄐㄧˋ ㄒㄩˋ","玩遊戲":"ㄨㄢˊ ㄧㄡˊ ㄒㄧˋ","讀地圖":"ㄉㄨˊ ㄉㄧˋ ㄊㄨˊ","地圖":"ㄉㄧˋ ㄊㄨˊ","地面":"ㄉㄧˋ ㄇㄧㄢˋ","地上":"ㄉㄧˋ ㄕㄤˋ","地板":"ㄉㄧˋ ㄅㄢˇ","到了":"ㄉㄠˋ ㄌㄜ˙","好了":"ㄏㄠˇ ㄌㄜ˙","開了":"ㄎㄞ ㄌㄜ˙","來了":"ㄌㄞˊ ㄌㄜ˙","笑了":"ㄒㄧㄠˋ ㄌㄜ˙","跑出來":"ㄆㄠˇ ㄔㄨ ㄌㄞˊ","走過":"ㄗㄡˇ ㄍㄨㄛˋ","朋友":"ㄆㄥˊ ㄧㄡˇ","背包":"ㄅㄟˋ ㄅㄠ","一下子":"ㄧˊ ㄒㄧㄚˋ ㄗ˙","好久":"ㄏㄠˇ ㄐㄧㄡˇ","好好":"ㄏㄠˇ ㄏㄠˇ","裡頭":"ㄌㄧˇ ㄊㄡ˙","裡面":"ㄌㄧˇ ㄇㄧㄢˋ","石頭":"ㄕˊ ㄊㄡ˙","鼻子":"ㄅㄧˊ ㄗ˙","桌子":"ㄓㄨㄛ ㄗ˙","有點":"ㄧㄡˇ ㄉㄧㄢˇ","坐好":"ㄗㄨㄛˋ ㄏㄠˇ","打扮":"ㄉㄚˇ ㄅㄢˋ","快樂":"ㄎㄨㄞˋ ㄌㄜˋ","快樂地":"ㄎㄨㄞˋ ㄌㄜˋ ㄉㄜ˙","生氣":"ㄕㄥ ㄑㄧˋ","小小的":"ㄒㄧㄠˇ ㄒㄧㄠˇ ㄉㄜ˙","好的":"ㄏㄠˇ ㄉㄜ˙","了！":"ㄌㄜ˙ ！"},"uncertain":["等你喔","園中"]};
+const STORAGE_KEY = 'block_zhuyin_adventure_v1';
+const CHAPTERS = DATA.chapters;
+const wordsSorted = [...DATA.vocab].sort((a,b)=>b.length-a.length || a.localeCompare(b,'zh-TW'));
+const state = {tab:'read',chapter:0,wordFilter:'all',quizLength:10,quiz:null,readingSize:1,scenes:{},best:{}};
+const $ = (sel,root=document) => root.querySelector(sel);
+const $$ = (sel,root=document) => [...root.querySelectorAll(sel)];
+const el = (tag,cl,txt) => {const n=document.createElement(tag);if(cl)n.className=cl;if(txt!==undefined)n.textContent=txt;return n;};
+function isHan(ch){return /[\u3400-\u9FFF\uF900-\uFAFF]/u.test(ch);}
+function readStorage(){
+  try {const r=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    if(r && typeof r==='object'){
+      state.scenes=(r.scenes&&typeof r.scenes==='object')?r.scenes:{};
+      state.best=(r.best&&typeof r.best==='object')?r.best:{};
+      state.readingSize=r.readingSize===1.15?1.15:1;
+    }
+  } catch (_e) {} applySize();
+}
+function saveStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({scenes:state.scenes,best:state.best,readingSize:state.readingSize}));}catch(_e){}}
+function applySize(){document.body.classList.toggle('large-type',state.readingSize===1.15);}
+function chInfo(){return CHAPTERS[state.chapter];}
+function chapterScenes(idx){return CHAPTERS[idx].story.split('\n').filter(Boolean);}
+function sceneIndex(){const max=chapterScenes(state.chapter).length-1;return Math.max(0,Math.min(max,Number(state.scenes[chInfo().id]||0)));}
+function fullTextExcerpt(full,start,end){
+  const punctuation='。！？!?\n';
+  let a=start,b=end;
+  while(a>0&&!punctuation.includes(full[a-1]))a--;
+  while(b<full.length&&!punctuation.includes(full[b]))b++;
+  if(b<full.length && full[b]!=='\n')b++;
+  if(b-a>52){ a=Math.max(a,start-14);b=Math.min(b,end+18); }
+  return {a,b};
+}
+function getTonePart(zy){return (zy.match(/[ˊˇˋ˙]/u)||[])[0]||'';}
+function classify(word){
+  const joined=(DATA.wordReadings[word]||[]).join('');
+  return joined.includes('ㄣ') && joined.includes('ㄥ') ? 'mix' :
+    joined.includes('ㄣ') ? 'en' : joined.includes('ㄥ') ? 'eng' : 'other';
+}
+const wordGroups={en:[],eng:[],mix:[],other:[]};
+for(const w of DATA.vocab)wordGroups[classify(w)].push(w);
+function createRuby(ch,zy,{hole=false,focus=false}={}){
+  const n=el('span','ruby-char'+(focus?' focus-han':'')+(hole?' missing-han':''));
+  const han=el('span','han',ch);n.appendChild(han);
+  if(zy){
+    const box=el('span','zh');box.setAttribute('aria-hidden','true');
+    const stk=el('span','zh-stack');
+    const sym=[...zy].filter(x=>/[\u3105-\u3129]/u.test(x));
+    let blanked=false;
+    sym.forEach(s=>{
+      if(hole && !blanked && (s==='ㄣ'||s==='ㄥ')){
+        const blank=el('span','blank-final','□');stk.appendChild(blank);blanked=true;
+      } else stk.appendChild(el('span','',s));
+    });
+    box.appendChild(stk);
+    const tone=getTonePart(zy);
+    if(tone)box.appendChild(el('span','zh-tone'+(tone==='˙'?' neutral':''),tone));
+    n.appendChild(box);
+  }
+  return n;
+}
+function wordAt(text,pos){for(const w of wordsSorted)if(text.startsWith(w,pos))return w;return null;}
+function textWithZhuyin(text,readings,opts={}){
+  const frag=document.createDocumentFragment();
+  const {highlightWords=true,focusStart=-1,focusEnd=-1,holeIndex=-1}=opts;
+  for(let i=0;i<text.length;){
+    if(isHan(text[i])){
+      const match=highlightWords?wordAt(text,i):null;
+      if(match){
+        const group=el('span','vocab-token'+(classify(match)==='mix'?' is-mix':''));
+        group.setAttribute('role','button');group.tabIndex=0;group.setAttribute('aria-label',match+'，查看注音');
+        for(let j=0;j<match.length;j++){
+          group.appendChild(createRuby(text[i+j],readings[i+j],{focus:i+j>=focusStart&&i+j<focusEnd,hole:i+j===holeIndex}));
+        }
+        group.addEventListener('click',()=>openWord(match));
+        group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openWord(match);}});
+        frag.appendChild(group);i+=match.length;
+      }else{
+        frag.appendChild(createRuby(text[i],readings[i],{focus:i>=focusStart&&i<focusEnd,hole:i===holeIndex}));i++;
+      }
+    }else{
+      const len=(text.slice(i).match(/^[A-Za-z0-9·\- ]+/)||[])[0]?.length||1;
+      const s=text.slice(i,i+len);
+      if(s==='\n'){frag.appendChild(el('br'));}
+      else frag.appendChild(el('span',/^[A-Za-z0-9]/.test(s)?'latin':'punct',s));
+      i+=len;
+    }
+  }
+  return frag;
+}
+function wordGlyphs(word,opts={}){
+  const f=document.createDocumentFragment();
+  const arr=opts.readings||DATA.wordReadings[word]||[];
+  for(let j=0;j<word.length;j++)f.appendChild(createRuby(word[j],arr[j],{hole:opts.holeIndex===j,focus:opts.focusIndex===j}));
+  return f;
+}
+function smoothTop(){window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+function showTab(tab){
+  state.tab=tab;
+  $$('.main-section').forEach(n=>n.classList.toggle('active',n.id==='panel-'+tab));
+  $$('.nav-item').forEach(n=>n.setAttribute('aria-current',n.dataset.tab===tab?'page':'false'));
+  if(tab==='read')renderRead();else if(tab==='quiz')renderQuiz();else renderWords();
+  smoothTop();
+}
+function selectChapter(i){
+  state.chapter=i;state.quiz=null;
+  if(state.tab==='read')renderRead();else if(state.tab==='quiz')renderQuiz();
+  smoothTop();
+}
+function renderWorldButtons(target){
+  target.replaceChildren();
+  CHAPTERS.forEach((c,i)=>{
+    const b=el('button','world-btn'+(i===state.chapter?' is-selected':''));b.type='button';
+    b.setAttribute('aria-pressed',i===state.chapter?'true':'false');
+    b.append(el('span','w-icon',c.emoji),el('span','w-title',(i+1)+'. '+c.short),el('span','w-small',c.theme));
+    if(Number(state.scenes[c.id]||0)>=chapterScenes(i).length-1 && i!==state.chapter)b.appendChild(el('span','w-done','✓'));
+    b.addEventListener('click',()=>selectChapter(i));target.appendChild(b);
+  });
+}
+function renderRead(){
+  renderWorldButtons($('#read-worlds'));
+  const ch=chInfo(), scenes=chapterScenes(state.chapter), i=sceneIndex();
+  const start=scenes.slice(0,i).reduce((a,b)=>a+b.length+1,0), scene=scenes[i];
+  const phone=ch.readings.slice(start,start+scene.length);
+  $('#scene-label').textContent='第 '+(i+1)+' / '+scenes.length+' 段';
+  $('#scene-progress').style.width=((i+1)/scenes.length*100)+'%';
+  $('#read-title').textContent=ch.title;
+  $('#read-subtitle').textContent=ch.subtitle+' · 點綠色詞語可以看完整注音';
+  const target=$('#read-text');target.replaceChildren(textWithZhuyin(scene,phone,{highlightWords:true}));
+  $('#prev-scene').disabled=i===0;
+  $('#next-scene').textContent=i===scenes.length-1?(state.chapter===3?'📚 再讀一次':'➡️ 下一篇故事'):'➡️ 下一段';
+  $('#read-count').textContent=(i+1)+' / '+scenes.length+' 段';
+  $('#read-finish').style.display=i===scenes.length-1&&state.chapter<3?'block':'none';
+  $$('.font-controls .tiny-btn').forEach(btn=>btn.setAttribute('aria-pressed',Number(btn.dataset.size)===state.readingSize?'true':'false'));
+}
+function changeScene(dir){
+  const n=sceneIndex()+dir,max=chapterScenes(state.chapter).length-1;
+  if(n<0)return;
+  if(n>max){if(state.chapter<3){state.chapter++;}state.scenes[chInfo().id]=0;}
+  else state.scenes[chInfo().id]=n;
+  saveStorage();renderRead();smoothTop();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+    toast('這個瀏覽器沒有提供朗讀功能，可直接閱讀注音。');return;
+  }
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/Minecraft/ig,'我的世界'));
+    u.lang='zh-TW';u.rate=.82;u.pitch=1.04;
+    const vs=speechSynthesis.getVoices();
+    const tw=vs.find(v=>/^zh[-_]TW$/i.test(v.lang));
+    if(tw)u.voice=tw;
+    speechSynthesis.speak(u);
+  }catch(_e){toast('裝置朗讀未啟用，請確認 iPhone 語音設定。');}
+}
+function currentSceneText(){return chapterScenes(state.chapter)[sceneIndex()];}
+
+function buildPool(idx){
+  const ch=CHAPTERS[idx],mode=ch.practice,results=[];
+  if(mode==='other')return [];
+  for(const w of DATA.vocab){
+    const kind=classify(w);
+    if(mode==='en' && kind!=='en' && kind!=='mix')continue;
+    if(mode==='eng' && kind!=='eng' && kind!=='mix')continue;
+    if(mode==='mix' && kind!=='mix')continue;
+    const start=ch.story.indexOf(w);
+    if(start<0)continue;
+    const syl=ch.readings.slice(start,start+w.length);
+    syl.forEach((zy,j)=>{
+      const final=zy.includes('ㄣ')?'ㄣ':zy.includes('ㄥ')?'ㄥ':null;
+      if(!final) return;
+      if(mode==='en' && final!=='ㄣ')return;
+      if(mode==='eng' && final!=='ㄥ')return;
+      results.push({w,start,j,final,zy,chapterId:ch.id});
+    });
+  }
+  return results;
+}
+function shuffle(list){const arr=[...list];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function balancePool(pool){
+  const en=shuffle(pool.filter(q=>q.final==='ㄣ')),eng=shuffle(pool.filter(q=>q.final==='ㄥ'));const a=[];
+  while(en.length||eng.length){if(en.length)a.push(en.pop());if(eng.length)a.push(eng.pop());}
+  return a;
+}
+function startQuiz(overridePool){
+  const raw=overridePool||buildPool(state.chapter);
+  if(!raw.length)return;
+  let list=(chInfo().practice==='mix')?balancePool(raw):shuffle(raw);
+  if(!overridePool && state.quizLength===10)list=list.slice(0,10);
+  state.quiz={chapterId:chInfo().id,list,pos:0,correct:0,answered:false,choice:null,wrong:[]};
+  renderQuiz();smoothTop();
+}
+function renderQuiz(){
+  renderWorldButtons($('#quiz-worlds'));
+  const ch=chInfo();const host=$('#quiz-body');host.replaceChildren();
+  if(ch.practice==='other'){
+    const n=el('div','card exam-other');
+    n.innerHTML='<h3>🏫 第四篇：其他注音閱讀</h3><p>這一篇主要讀「蝌蚪、日曆、叉子、玻璃杯」等其他韻母詞語，因此不安排 ㄣ／ㄥ 挖空考題。</p><p>照片裡其他含 ㄥ 的詞（如「疼痛、好冷、東西」）已放在第二篇的故事中練習。</p>';
+    const b=el('button','wide-btn primary','📖 去讀第四篇');b.addEventListener('click',()=>showTab('read'));n.appendChild(b);host.appendChild(n);return;
+  }
+  if(!state.quiz || state.quiz.chapterId!==ch.id){renderQuizSetup(host,ch);return;}
+  if(state.quiz.pos>=state.quiz.list.length){renderQuizDone(host,ch);return;}
+  renderQuizPlay(host,ch);
+}
+function renderQuizSetup(host,ch){
+  const n=el('div','card quiz-setup');
+  n.appendChild(el('h3','',ch.emoji+' '+ch.theme+'・挖空挑戰'));
+  n.appendChild(el('p','','看看國字旁邊的注音，選出不見的韻母！答錯也沒關係，可以學會再挑戰。'));
+  const nQ=buildPool(state.chapter).length;
+  const cap=el('div','stat-chip','本篇共有 '+nQ+' 個注音挖空');n.appendChild(cap);
+  n.appendChild(el('div','answer-hint','這次想挑戰幾題？'));
+  const row=el('div','picker-row');
+  [{count:10,label:'⭐ 快速 10 題'},{count:0,label:'🏆 全部 '+nQ+' 題'}].forEach(({count,label})=>{
+    const b=el('button','pick'+(state.quizLength===count?' selected':''),label);
+    b.setAttribute('aria-pressed',state.quizLength===count?'true':'false');
+    b.addEventListener('click',()=>{state.quizLength=count;renderQuiz();});row.appendChild(b);
+  });n.appendChild(row);
+  const go=el('button','wide-btn sun','⛏️ 開始闖關');go.style.width='100%';go.addEventListener('click',()=>startQuiz());n.appendChild(go);
+  const best=state.best[ch.id];
+  if(best)n.appendChild(el('p','',`上次最佳成績：${best.correct} / ${best.total}（${Math.round(best.correct/best.total*100)}%）`));
+  host.appendChild(n);
+  const method=el('div','help-section card');method.innerHTML='<h3>🎯 如何作答？</h3><p>例如「清晨」的「清」是「ㄑㄧ□」，選「ㄥ」；「晨」是「ㄔ□ˊ」，選「ㄣ」。每次只挖空一個字的韻母，點下方大按鈕選答案。</p>';host.appendChild(method);
+}
+function renderQuizPlay(host,ch){
+  const qz=state.quiz,q=qz.list[qz.pos];
+  const card=el('div','card quiz-play');
+  const top=el('div','quiz-stats');top.append(el('span','',`第 ${qz.pos+1} / ${qz.list.length} 題`),el('span','quiz-stars',`⭐ ${qz.correct} 顆星`));card.appendChild(top);
+  const prog=el('div','quiz-prog');const progress=el('div');progress.style.width=((qz.pos+(qz.answered?1:0))/qz.list.length*100)+'%';prog.appendChild(progress);card.appendChild(prog);
+  card.appendChild(el('div','quiz-label','找出黃色空格不見的注音'));
+  const word=el('div','quiz-word');word.appendChild(wordGlyphs(q.w,{readings:ch.readings.slice(q.start,q.start+q.w.length),holeIndex:qz.answered?-1:q.j,focusIndex:q.j}));card.appendChild(word);
+  const audio=el('button','quiz-audio','🔊 聽這個詞怎麼唸');audio.addEventListener('click',()=>speak(q.w));card.appendChild(audio);
+  card.appendChild(el('div','quiz-sub','故事中的這句話')); 
+  const {a,b}=fullTextExcerpt(ch.story,q.start,q.start+q.w.length);
+  const context=el('div','quiz-sentence');
+  context.appendChild(textWithZhuyin(ch.story.slice(a,b),ch.readings.slice(a,b),{highlightWords:false,focusStart:q.start-a,focusEnd:q.start-a+q.w.length,holeIndex:qz.answered?-1:q.start-a+q.j}));
+  card.appendChild(context);
+  card.appendChild(el('p','answer-hint','這一格要填哪個韻母？'));
+  const answers=el('div','answer-row');
+  ['ㄣ','ㄥ'].forEach(a=>{
+    const btn=el('button','answer-button',a);
+    if(qz.answered){btn.disabled=true;if(a===q.final)btn.classList.add('correct');else if(a===qz.choice)btn.classList.add('wrong');}
+    btn.addEventListener('click',()=>answerQuiz(a));answers.appendChild(btn);
+  });card.appendChild(answers);
+  if(qz.answered){
+    const good=qz.choice===q.final;
+    const feedback=el('div','quiz-feedback'+(good?'':' error'),good?'✅ 答對了！獲得一顆星！':`💡 再記一次：${q.w} 的「${q.w[q.j]}」要用 ${q.final}。`);
+    card.appendChild(feedback);
+    const next=el('button','wide-btn primary quiz-next',qz.pos===qz.list.length-1?'🏁 看闖關成績':'➡️ 下一題');
+    next.addEventListener('click',nextQuiz);card.appendChild(next);
+  }
+  host.appendChild(card);
+  const back=el('button','tiny-btn','← 返回選題');back.style.margin='12px 0';back.addEventListener('click',()=>{state.quiz=null;renderQuiz();});host.appendChild(back);
+}
+function answerQuiz(choice){
+  if(!state.quiz||state.quiz.answered)return;
+  const q=state.quiz.list[state.quiz.pos];state.quiz.choice=choice;state.quiz.answered=true;
+  if(choice===q.final)state.quiz.correct++;else state.quiz.wrong.push(q);
+  renderQuiz();
+}
+function nextQuiz(){if(!state.quiz||!state.quiz.answered)return;state.quiz.pos++;state.quiz.answered=false;state.quiz.choice=null;
+  if(state.quiz.pos===state.quiz.list.length){
+    const q=state.quiz;const old=state.best[q.chapterId];
+    if(!old||q.correct/q.list.length>=old.correct/old.total)state.best[q.chapterId]={correct:q.correct,total:q.list.length};
+    saveStorage();
+  }
+  renderQuiz();smoothTop();
+}
+function renderQuizDone(host,ch){
+  const q=state.quiz,total=q.list.length,rate=q.correct/total;
+  const card=el('div','card quiz-done');
+  card.appendChild(el('span','medal',rate===1?'🏆':rate>=.8?'🥇':rate>=.5?'⭐':'💪'));
+  card.appendChild(el('h3','',rate===1?'終界高手，滿分！':rate>=.8?'闖關成功！':'挑戰完成！'));
+  card.appendChild(el('p','',`你完成了 ${total} 題，今天又更會分辨 ㄣ 和 ㄥ 了！`));
+  card.appendChild(el('div','big-score',`${q.correct} / ${total}`));
+  card.appendChild(el('p','',`正確率 ${Math.round(rate*100)}%｜答錯 ${q.wrong.length} 題`));
+  const retry=el('button','wide-btn sun','🔄 再挑戰一次');retry.style.width='100%';retry.addEventListener('click',()=>startQuiz());card.appendChild(retry);
+  if(q.wrong.length){const wrong=el('button','wide-btn soft','🎯 只重練錯題');wrong.style.width='100%';wrong.style.marginTop='12px';wrong.addEventListener('click',()=>startQuiz(q.wrong));card.appendChild(wrong);}
+  const read=el('button','wide-btn','📖 回到故事');read.style.width='100%';read.style.marginTop='12px';read.addEventListener('click',()=>showTab('read'));card.appendChild(read);
+  host.appendChild(card);
+}
+function renderWords(){
+  const row=$('#word-filters');row.replaceChildren();
+  const order=[['all','全部'],['en','ㄣ'],['eng','ㄥ'],['mix','混合'],['other','其他']];
+  order.forEach(([key,label])=>{
+    const count=key==='all'?DATA.vocab.length:wordGroups[key].length;
+    const b=el('button','filter-btn'+(state.wordFilter===key?' active':''),`${label} ${count}`);
+    b.setAttribute('aria-pressed',state.wordFilter===key?'true':'false');
+    b.addEventListener('click',()=>{state.wordFilter=key;renderWords();});row.appendChild(b);
+  });
+  const keys=state.wordFilter==='all'?DATA.vocab:wordGroups[state.wordFilter];
+  const grid=$('#word-grid');grid.replaceChildren();
+  keys.forEach(w=>{
+    const n=el('button','word-card');n.type='button';
+    const gp=el('span','word-glyphs');gp.appendChild(wordGlyphs(w));n.appendChild(gp);
+    const kind=classify(w);
+    const label={en:'ㄣ',eng:'ㄥ',mix:'ㄣ + ㄥ',other:'其他'}[kind];
+    n.appendChild(el('span','word-kind',label));
+    if(DATA.uncertain.includes(w))n.appendChild(el('span','word-flag','手寫待核對'));
+    n.addEventListener('click',()=>openWord(w));grid.appendChild(n);
+  });
+  $('#word-count').textContent=`顯示 ${keys.length} / ${DATA.vocab.length} 個詞語`;
+}
+let lastFocus=null;
+function openWord(w){
+  lastFocus=document.activeElement;
+  const body=$('#sheet-inner');body.replaceChildren();
+  const kind=classify(w), label={en:'只有 ㄣ',eng:'只有 ㄥ',mix:'ㄣ ＋ ㄥ 都有',other:'其他韻母'}[kind];
+  body.appendChild(el('span','sheet-label','詞語放大鏡 · '+label));
+  const gp=el('div','sheet-word');gp.appendChild(wordGlyphs(w));body.appendChild(gp);
+  if(DATA.uncertain.includes(w))body.appendChild(el('p','','提醒：這個詞語在原始手寫照片中仍待核對。'));
+  else body.appendChild(el('p','','一起看右邊的注音，慢慢唸一次。'));
+  if(kind==='mix')body.appendChild(el('p','','這個詞同時有 ㄣ 和 ㄥ，要注意兩種鼻音不同。'));
+  const btn=el('button','wide-btn primary sheet-btn','🔊 唸出這個詞');btn.addEventListener('click',()=>speak(w));body.appendChild(btn);
+  $('#sheet').classList.add('open');$('#sheet').setAttribute('aria-hidden','false');$('#sheet-close').focus();
+}
+function closeSheet(){
+  $('#sheet').classList.remove('open');$('#sheet').setAttribute('aria-hidden','true');
+  if(lastFocus&&lastFocus.isConnected)lastFocus.focus();
+}
+let toastTimer;
+function toast(msg){
+  const n=$('#toast');n.textContent=msg;n.style.display='block';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>n.style.display='none',3200);
+}
+function wire(){
+  $$('.nav-item').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+  $('#prev-scene').addEventListener('click',()=>changeScene(-1));
+  $('#next-scene').addEventListener('click',()=>changeScene(1));
+  $('#read-aloud').addEventListener('click',()=>speak(currentSceneText()));
+  $('#read-finish').addEventListener('click',()=>{state.quiz=null;showTab('quiz');});
+  $$('.font-controls .tiny-btn').forEach(b=>b.addEventListener('click',()=>{
+    state.readingSize=Number(b.dataset.size);applySize();saveStorage();renderRead();
+  }));
+  $('#sheet-close').addEventListener('click',closeSheet);
+  $('#sheet').addEventListener('click',e=>{if(e.target===$('#sheet'))closeSheet();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&'speechSynthesis'in window)speechSynthesis.cancel();});
+}
+readStorage();wire();showTab('read');
+
+</script>
+</body>
+</html>
